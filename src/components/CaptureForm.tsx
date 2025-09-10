@@ -40,10 +40,15 @@ export const CaptureForm = () => {
     // Here we would typically send data to a backend
     toast({
       title: "Inscription réussie !",
-      description: "Vous allez maintenant découvrir votre archétype mythologique.",
+      description: "Redirection vers le quiz en cours...",
     });
     
     console.log("Form submitted:", formData);
+    
+    // Redirection vers le quiz après un court délai
+    setTimeout(() => {
+      window.location.href = "/quiz";
+    }, 1500);
   };
 
   return (
