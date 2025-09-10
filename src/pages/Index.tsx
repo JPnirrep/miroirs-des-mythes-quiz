@@ -1,5 +1,6 @@
 import { ArchetypeCard } from "@/components/ArchetypeCard";
 import { CaptureForm } from "@/components/CaptureForm";
+import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
@@ -33,12 +34,16 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-ethereal">
       {/* Header avec le logo */}
       <header className="container mx-auto px-4 py-8">
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-between items-center mb-12">
+          <div className="flex-1"></div>
           <img 
             src="/lovable-uploads/cd4bfa3a-267e-44c0-b24d-37363c1e5239.png" 
             alt="La Fabrique PEPPS" 
             className="h-20 animate-fade-in"
           />
+          <div className="flex-1 flex justify-end">
+            <GoogleAuthButton />
+          </div>
         </div>
       </header>
 
