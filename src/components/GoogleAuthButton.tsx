@@ -7,7 +7,11 @@ export const GoogleAuthButton = () => {
 
   if (loading) {
     return (
-      <Button variant="outline" disabled className="font-lato">
+      <Button 
+        variant="outline" 
+        disabled 
+        className="font-lato border-primary/30 text-primary bg-cloud-white/80 backdrop-blur-sm shadow-mythical"
+      >
         <User className="w-4 h-4 mr-2" />
         Chargement...
       </Button>
@@ -19,7 +23,7 @@ export const GoogleAuthButton = () => {
       <Button 
         onClick={signOut} 
         variant="outline" 
-        className="font-lato border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+        className="font-lato border-primary/50 text-primary bg-cloud-white/90 backdrop-blur-sm hover:bg-gradient-divine hover:text-primary-foreground hover:border-transparent transition-all duration-300 shadow-mythical hover:shadow-divine animate-fade-in"
       >
         <LogOut className="w-4 h-4 mr-2" />
         Se déconnecter
@@ -31,7 +35,7 @@ export const GoogleAuthButton = () => {
     <Button 
       onClick={signInWithGoogle}
       variant="outline"
-      className="font-lato border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
+      className="font-lato border-primary/50 text-primary bg-cloud-white/90 backdrop-blur-sm hover:bg-gradient-divine hover:text-primary-foreground hover:border-transparent transition-all duration-300 shadow-mythical hover:shadow-divine animate-fade-in hover:scale-105"
     >
       <LogIn className="w-4 h-4 mr-2" />
       Connexion Google
