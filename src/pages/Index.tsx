@@ -1,6 +1,5 @@
 import { ArchetypeCard } from "@/components/ArchetypeCard";
 import { CaptureForm } from "@/components/CaptureForm";
-import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
@@ -41,9 +40,7 @@ const Index = () => {
             alt="La Fabrique PEPPS" 
             className="h-20 animate-fade-in"
           />
-          <div className="flex-1 flex justify-end">
-            <GoogleAuthButton />
-          </div>
+          <div className="flex-1"></div>
         </div>
       </header>
 
