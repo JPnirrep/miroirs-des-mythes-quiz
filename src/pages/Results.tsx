@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, RotateCcw, Crown, Sparkles, Star, Target } from "lucide-react";
+import { ArrowLeft, RotateCcw, Crown, Sparkles, Star, Target, Download } from "lucide-react";
+import jsPDF from "jspdf";
 import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
@@ -191,6 +192,122 @@ const getGrowthMessage = (lowestArchetype: string): string => {
     hestia: "Votre énergie est communicative. Imaginez l'équilibre parfait si vous appreniez à doser cette intensité avec des moments de calme apaisant !"
   };
   return messages[lowestArchetype as keyof typeof messages] || "";
+};
+
+// Fonction pour générer et télécharger le PDF des résultats
+const generatePDF = (
+  profileAnalysis: ProfileAnalysis, 
+  scores: ArchetypeScore, 
+  userData?: { firstName: string; lastName: string; email: string }
+) => {
+  const pdf = new jsPDF();
+  const primaryData = archetypesData[profileAnalysis.primary];
+  const secondaryData = profileAnalysis.secondary ? archetypesData[profileAnalysis.secondary] : null;
+  const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+
+  // En-tête
+  pdf.setFontSize(20);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Résultats Quiz PEPPS', 20, 30);
+  
+  if (userData) {
+    pdf.setFontSize(12);
+    pdf.text(`${userData.firstName} ${userData.lastName}`, 20, 45);
+    pdf.text(`${userData.email}`, 20, 55);
+  }
+
+  // Titre du profil
+  let yPosition = userData ? 70 : 50;
+  pdf.setFontSize(16);
+  pdf.setTextColor(51, 51, 102);
+  
+  const profileTitle = profileAnalysis.type === 'dominant' 
+    ? `Votre Profil : ${primaryData.name}`
+    : profileAnalysis.type === 'combine'
+    ? `Profil Combiné : ${primaryData.name} & ${secondaryData?.name}`
+    : `Profil Nuancé : ${primaryData.name}`;
+  
+  pdf.text(profileTitle, 20, yPosition);
+  yPosition += 20;
+
+  // Profil principal
+  pdf.setFontSize(14);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text(`${primaryData.name} - ${primaryData.subtitle}`, 20, yPosition);
+  yPosition += 15;
+
+  pdf.setFontSize(12);
+  pdf.setTextColor(102, 102, 153);
+  pdf.text(primaryData.title, 20, yPosition);
+  yPosition += 15;
+
+  // Description (avec gestion des retours à la ligne)
+  const splitDescription = pdf.splitTextToSize(primaryData.description, 170);
+  pdf.text(splitDescription, 20, yPosition);
+  yPosition += splitDescription.length * 6 + 10;
+
+  // Déclics PEPPS
+  pdf.setFontSize(14);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Tes déclics PEPPS pour briller :', 20, yPosition);
+  yPosition += 15;
+
+  primaryData.declics.forEach((declic, index) => {
+    pdf.setFontSize(12);
+    pdf.setTextColor(51, 51, 102);
+    pdf.text(`${declic.title}`, 25, yPosition);
+    yPosition += 8;
+    
+    pdf.setTextColor(102, 102, 153);
+    const splitContent = pdf.splitTextToSize(declic.content, 165);
+    pdf.text(splitContent, 25, yPosition);
+    yPosition += splitContent.length * 6 + 8;
+  });
+
+  // Nouvelle page si nécessaire
+  if (yPosition > 250) {
+    pdf.addPage();
+    yPosition = 30;
+  }
+
+  // Scores détaillés
+  pdf.setFontSize(14);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Votre répartition complète :', 20, yPosition);
+  yPosition += 20;
+
+  Object.entries(archetypesData).forEach(([key, data]) => {
+    const score = scores[key as keyof ArchetypeScore];
+    const percentage = Math.round((score / totalScore) * 100);
+    
+    pdf.setFontSize(12);
+    pdf.setTextColor(51, 51, 102);
+    pdf.text(`${data.name} (${data.subtitle}): ${score}/30 (${percentage}%)`, 25, yPosition);
+    yPosition += 8;
+  });
+
+  // Déclic de croissance
+  yPosition += 10;
+  pdf.setFontSize(14);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Votre déclic de croissance :', 20, yPosition);
+  yPosition += 15;
+
+  const growthData = archetypesData[profileAnalysis.lowestScore];
+  pdf.setFontSize(12);
+  pdf.text(`${growthData.name} - ${growthData.subtitle}`, 25, yPosition);
+  yPosition += 10;
+  
+  const growthMessage = getGrowthMessage(profileAnalysis.lowestScore);
+  const splitGrowthMessage = pdf.splitTextToSize(growthMessage, 165);
+  pdf.text(splitGrowthMessage, 25, yPosition);
+
+  // Télécharger le PDF
+  const fileName = userData 
+    ? `quiz-pepps-${userData.firstName}-${userData.lastName}.pdf`
+    : 'quiz-pepps-resultats.pdf';
+  
+  pdf.save(fileName);
 };
 
 export default function Results() {
@@ -525,7 +642,7 @@ export default function Results() {
 
         {/* Actions */}
         <section className="text-center space-y-6">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
             <Button
               variant="outline"
               onClick={() => navigate("/")}
@@ -533,6 +650,19 @@ export default function Results() {
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Accueil
+            </Button>
+            
+            <Button
+              onClick={() => {
+                const userData = localStorage.getItem('quizUserData');
+                const parsedUserData = userData ? JSON.parse(userData) : undefined;
+                generatePDF(profileAnalysis, scores, parsedUserData);
+              }}
+              variant="secondary"
+              className="font-lato bg-accent hover:bg-accent/80 text-primary-foreground shadow-lg hover:shadow-mythical transition-all duration-300"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Télécharger PDF
             </Button>
             
             <Button
