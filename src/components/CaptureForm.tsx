@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 
 export const CaptureForm = () => {
@@ -15,6 +16,7 @@ export const CaptureForm = () => {
     rgpdConsent: false
   });
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +49,7 @@ export const CaptureForm = () => {
     
     // Redirection vers le quiz après un court délai
     setTimeout(() => {
-      window.location.href = "/quiz";
+      navigate("/quiz-intro");
     }, 1500);
   };
 
