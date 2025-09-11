@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, RotateCcw, Crown, Sparkles, Star, Target, Download } from "lucide-react";
 import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
@@ -195,190 +196,193 @@ const getGrowthMessage = (lowestArchetype: string): string => {
 };
 
 // Fonction pour générer et télécharger le PDF des résultats
-const generatePDF = (
+const generatePDF = async (
   profileAnalysis: ProfileAnalysis, 
   scores: ArchetypeScore, 
   userData?: { firstName: string; lastName: string; email: string }
 ) => {
-  const pdf = new jsPDF();
-  const primaryData = archetypesData[profileAnalysis.primary];
-  const secondaryData = profileAnalysis.secondary ? archetypesData[profileAnalysis.secondary] : null;
-  const growthData = archetypesData[profileAnalysis.lowestScore];
-  const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-
-  let yPosition = 30;
-
-  // Helper function pour le titre du profil (même logique que la page)
-  const getProfileTitle = () => {
-    switch (profileAnalysis.type) {
-      case 'dominant':
-        return `Votre Profil : ${primaryData.name}`;
-      case 'combine':
-        return `Votre Profil Combiné : ${primaryData.name} & ${secondaryData?.name}`;
-      case 'nuance':
-        return `Votre Profil Nuancé : ${primaryData.name}`;
-      default:
-        return `Votre Profil : ${primaryData.name}`;
+  try {
+    // Masquer temporairement la section Actions pour la capture
+    const actionsSection = document.querySelector('[data-actions-section]') as HTMLElement;
+    if (actionsSection) {
+      actionsSection.style.display = 'none';
     }
-  };
 
-  // ===== HEADER =====
-  pdf.setFontSize(16);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('La Fabrique PEPPS', 105, yPosition, { align: 'center' });
-  yPosition += 20;
+    // Capturer la page de résultats (sans les boutons)
+    const element = document.querySelector('.container.mx-auto.px-4.py-12') as HTMLElement;
+    if (!element) {
+      throw new Error('Impossible de trouver le contenu à capturer');
+    }
 
-  // Données utilisateur
-  if (userData) {
-    pdf.setFontSize(12);
-    pdf.setTextColor(102, 102, 153);
-    pdf.text(`${userData.firstName} ${userData.lastName} - ${userData.email}`, 105, yPosition, { align: 'center' });
-    yPosition += 15;
-  }
+    const canvas = await html2canvas(element, {
+      scale: 2, // Haute qualité
+      useCORS: true,
+      backgroundColor: null,
+      width: element.offsetWidth,
+      height: element.offsetHeight,
+      scrollX: 0,
+      scrollY: 0,
+    });
 
-  // ===== TITRE PRINCIPAL =====
-  pdf.setFontSize(18);
-  pdf.setTextColor(51, 51, 102);
-  const profileTitle = getProfileTitle();
-  pdf.text(profileTitle, 105, yPosition, { align: 'center' });
-  yPosition += 25;
+    // Remettre la section Actions
+    if (actionsSection) {
+      actionsSection.style.display = '';
+    }
 
-  // ===== PROFIL PRINCIPAL =====
-  pdf.setFontSize(16);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text(primaryData.name, 20, yPosition);
-  yPosition += 10;
+    const imgData = canvas.toDataURL('image/png');
 
-  pdf.setFontSize(14);
-  pdf.setTextColor(102, 102, 153);
-  pdf.text(primaryData.subtitle, 20, yPosition);
-  yPosition += 15;
+    // Créer le PDF avec format A4
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = 210; // A4 width in mm
+    const pdfHeight = 297; // A4 height in mm
+    
+    // Marges
+    const margin = 15;
+    const contentWidth = pdfWidth - (2 * margin);
+    
+    // Calculer les dimensions de l'image
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = imgWidth / imgHeight;
+    
+    // Adapter l'image au format PDF
+    let scaledWidth = contentWidth;
+    let scaledHeight = scaledWidth / ratio;
+    
+    // Si l'image est trop haute, l'adapter
+    const maxHeight = pdfHeight - (2 * margin) - 40; // 40mm pour l'en-tête et pied de page
+    if (scaledHeight > maxHeight) {
+      scaledHeight = maxHeight;
+      scaledWidth = scaledHeight * ratio;
+    }
 
-  pdf.setFontSize(13);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text(primaryData.title, 20, yPosition);
-  yPosition += 15;
-
-  pdf.setFontSize(11);
-  pdf.setTextColor(80, 80, 80);
-  const splitDescription = pdf.splitTextToSize(primaryData.description, 170);
-  pdf.text(splitDescription, 20, yPosition);
-  yPosition += splitDescription.length * 5 + 15;
-
-  // ===== PROFIL SECONDAIRE (si applicable) =====
-  if (secondaryData) {
+    // ===== EN-TÊTE =====
     pdf.setFontSize(16);
     pdf.setTextColor(51, 51, 102);
-    const secondaryTitle = profileAnalysis.type === 'combine' 
-      ? 'Votre Second Profil Dominant' 
-      : 'Votre Nuance Secondaire';
-    pdf.text(secondaryTitle, 20, yPosition);
-    yPosition += 15;
-
-    pdf.setFontSize(14);
-    pdf.text(`${secondaryData.name} - ${secondaryData.subtitle}`, 25, yPosition);
-    yPosition += 10;
-
-    pdf.setFontSize(12);
-    pdf.text(secondaryData.title, 25, yPosition);
-    yPosition += 10;
-
-    pdf.setFontSize(10);
-    pdf.setTextColor(80, 80, 80);
-    const splitSecondaryDesc = pdf.splitTextToSize(secondaryData.description, 165);
-    pdf.text(splitSecondaryDesc, 25, yPosition);
-    yPosition += splitSecondaryDesc.length * 4 + 15;
-  }
-
-  // Nouvelle page si nécessaire
-  if (yPosition > 220) {
-    pdf.addPage();
-    yPosition = 30;
-  }
-
-  // ===== DÉCLICS PEPPS =====
-  pdf.setFontSize(16);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Tes déclics PEPPS pour briller', 20, yPosition);
-  yPosition += 20;
-
-  primaryData.declics.forEach((declic, index) => {
-    pdf.setFontSize(12);
-    pdf.setTextColor(51, 51, 102);
-    pdf.text(`★ ${declic.title}`, 25, yPosition);
-    yPosition += 10;
+    pdf.text('LA FABRIQUE PEPPS', pdfWidth / 2, 20, { align: 'center' });
     
-    pdf.setFontSize(11);
-    pdf.setTextColor(80, 80, 80);
-    const splitContent = pdf.splitTextToSize(declic.content, 165);
-    pdf.text(splitContent, 25, yPosition);
-    yPosition += splitContent.length * 5 + 12;
-  });
-
-  // Nouvelle page si nécessaire
-  if (yPosition > 220) {
-    pdf.addPage();
-    yPosition = 30;
-  }
-
-  // ===== DÉCLIC DE CROISSANCE =====
-  pdf.setFontSize(16);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Votre "Déclic de Croissance"', 20, yPosition);
-  yPosition += 15;
-
-  pdf.setFontSize(12);
-  pdf.setTextColor(102, 102, 153);
-  pdf.text('Votre score le plus faible n\'est pas une faiblesse, c\'est votre plus belle opportunité d\'évolution !', 20, yPosition);
-  yPosition += 15;
-
-  pdf.setFontSize(14);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text(`${growthData.name} - ${growthData.subtitle}`, 25, yPosition);
-  yPosition += 15;
-
-  pdf.setFontSize(12);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Votre opportunité de croissance :', 25, yPosition);
-  yPosition += 10;
-  
-  pdf.setFontSize(11);
-  pdf.setTextColor(80, 80, 80);
-  const growthMessage = getGrowthMessage(profileAnalysis.lowestScore);
-  const splitGrowthMessage = pdf.splitTextToSize(growthMessage, 165);
-  pdf.text(splitGrowthMessage, 25, yPosition);
-  yPosition += splitGrowthMessage.length * 5 + 20;
-
-  // ===== RÉPARTITION COMPLÈTE =====
-  pdf.setFontSize(16);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Votre Répartition Complète', 20, yPosition);
-  yPosition += 20;
-
-  Object.entries(archetypesData).forEach(([key, data]) => {
-    const score = scores[key as keyof ArchetypeScore];
-    const percentage = Math.round((score / totalScore) * 100);
-    const isPrimary = key === profileAnalysis.primary;
-    const isSecondary = key === profileAnalysis.secondary;
-    const isLowest = key === profileAnalysis.lowestScore;
-    
-    let prefix = '';
-    if (isPrimary) prefix = '👑 ';
-    else if (isSecondary) prefix = '⭐ ';
-    else if (isLowest) prefix = '🎯 ';
-
     pdf.setFontSize(12);
-    pdf.setTextColor(51, 51, 102);
-    pdf.text(`${prefix}${data.name} (${data.subtitle}): ${score}/30 (${percentage}%)`, 25, yPosition);
-    yPosition += 8;
-  });
+    pdf.setTextColor(102, 102, 153);
+    pdf.text('Résultats du Quiz des Super-Pouvoirs de Communicant(e)', pdfWidth / 2, 28, { align: 'center' });
 
-  // Télécharger le PDF
-  const fileName = userData 
-    ? `quiz-pepps-${userData.firstName}-${userData.lastName}.pdf`
-    : 'quiz-pepps-resultats.pdf';
+    // Ligne de séparation
+    pdf.setDrawColor(51, 51, 102);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin, 32, pdfWidth - margin, 32);
+
+    // ===== INFORMATIONS UTILISATEUR =====
+    if (userData) {
+      pdf.setFontSize(11);
+      pdf.setTextColor(80, 80, 80);
+      pdf.text(`Participant(e) : ${userData.firstName} ${userData.lastName}`, margin, 40);
+      pdf.text(`Email : ${userData.email}`, margin, 45);
+      pdf.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, pdfWidth - margin, 40, { align: 'right' });
+    } else {
+      pdf.setFontSize(11);
+      pdf.setTextColor(80, 80, 80);
+      pdf.text(`Date : ${new Date().toLocaleDateString('fr-FR')}`, pdfWidth - margin, 40, { align: 'right' });
+    }
+
+    // ===== CONTENU PRINCIPAL (IMAGE) =====
+    const yPosition = userData ? 55 : 50;
+    
+    // Centrer l'image horizontalement
+    const imgX = (pdfWidth - scaledWidth) / 2;
+    
+    // Si l'image dépasse une page, la diviser
+    if (scaledHeight > pdfHeight - yPosition - 20) {
+      // Première page
+      const firstPageHeight = pdfHeight - yPosition - 20;
+      const cropRatio = firstPageHeight / scaledHeight;
+      const cropPixelHeight = imgHeight * cropRatio;
+      
+      // Créer une image tronquée pour la première page
+      const firstCanvas = document.createElement('canvas');
+      const firstCtx = firstCanvas.getContext('2d');
+      firstCanvas.width = imgWidth;
+      firstCanvas.height = cropPixelHeight;
+      
+      const img = new Image();
+      img.onload = () => {
+        if (firstCtx) {
+          firstCtx.drawImage(img, 0, 0, imgWidth, cropPixelHeight, 0, 0, imgWidth, cropPixelHeight);
+          const firstImgData = firstCanvas.toDataURL('image/png');
+          
+          pdf.addImage(firstImgData, 'PNG', imgX, yPosition, scaledWidth, firstPageHeight);
+          
+          // Pied de page première page
+          addFooter(pdf, pdfWidth, pdfHeight, margin, 1);
+          
+          // Nouvelle page pour le reste
+          pdf.addPage();
+          
+          // En-tête deuxième page
+          pdf.setFontSize(12);
+          pdf.setTextColor(51, 51, 102);
+          pdf.text('LA FABRIQUE PEPPS - Suite des résultats', pdfWidth / 2, 20, { align: 'center' });
+          pdf.line(margin, 25, pdfWidth - margin, 25);
+          
+          // Reste de l'image
+          const secondCanvas = document.createElement('canvas');
+          const secondCtx = secondCanvas.getContext('2d');
+          secondCanvas.width = imgWidth;
+          secondCanvas.height = imgHeight - cropPixelHeight;
+          
+          if (secondCtx) {
+            secondCtx.drawImage(img, 0, cropPixelHeight, imgWidth, imgHeight - cropPixelHeight, 0, 0, imgWidth, imgHeight - cropPixelHeight);
+            const secondImgData = secondCanvas.toDataURL('image/png');
+            
+            const remainingHeight = scaledHeight - firstPageHeight;
+            pdf.addImage(secondImgData, 'PNG', imgX, 35, scaledWidth, remainingHeight);
+            
+            // Pied de page deuxième page
+            addFooter(pdf, pdfWidth, pdfHeight, margin, 2);
+          }
+          
+          // Télécharger le PDF
+          const fileName = userData 
+            ? `quiz-pepps-${userData.firstName}-${userData.lastName}.pdf`
+            : 'quiz-pepps-resultats.pdf';
+          
+          pdf.save(fileName);
+        }
+      };
+      img.src = imgData;
+    } else {
+      // L'image tient sur une page
+      pdf.addImage(imgData, 'PNG', imgX, yPosition, scaledWidth, scaledHeight);
+      
+      // Pied de page
+      addFooter(pdf, pdfWidth, pdfHeight, margin, 1);
+      
+      // Télécharger le PDF
+      const fileName = userData 
+        ? `quiz-pepps-${userData.firstName}-${userData.lastName}.pdf`
+        : 'quiz-pepps-resultats.pdf';
+      
+      pdf.save(fileName);
+    }
+
+  } catch (error) {
+    console.error('Erreur lors de la génération du PDF:', error);
+    alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
+  }
+};
+
+// Fonction pour ajouter un pied de page professionnel
+const addFooter = (pdf: jsPDF, pdfWidth: number, pdfHeight: number, margin: number, pageNumber: number) => {
+  const footerY = pdfHeight - 15;
   
-  pdf.save(fileName);
+  // Ligne de séparation
+  pdf.setDrawColor(200, 200, 200);
+  pdf.setLineWidth(0.3);
+  pdf.line(margin, footerY - 5, pdfWidth - margin, footerY - 5);
+  
+  // Texte du pied de page
+  pdf.setFontSize(8);
+  pdf.setTextColor(120, 120, 120);
+  pdf.text('La Fabrique PEPPS - Quiz des Super-Pouvoirs de Communicant(e)', margin, footerY);
+  pdf.text(`Page ${pageNumber}`, pdfWidth - margin, footerY, { align: 'right' });
 };
 
 export default function Results() {
@@ -712,7 +716,7 @@ export default function Results() {
         </section>
 
         {/* Actions */}
-        <section className="text-center space-y-6">
+        <section data-actions-section className="text-center space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
             <Button
               variant="outline"
