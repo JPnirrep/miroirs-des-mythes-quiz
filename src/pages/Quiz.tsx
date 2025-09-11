@@ -115,122 +115,144 @@ export default function Quiz() {
     const pauseText = pauseTexts[currentQuestion + 1 as keyof typeof pauseTexts];
     
     return (
-      <div className="min-h-screen bg-gradient-mythical p-4 flex items-center justify-center">
-        <Card className="max-w-2xl w-full p-8 bg-cloud-white/95 backdrop-blur-sm shadow-divine border-primary/20">
-          <div className="text-center space-y-6">
-            <h2 className="text-2xl font-cinzel font-bold text-primary">Pause réflexive</h2>
-            <p className="text-lg text-primary/80 font-lato leading-relaxed">
-              {pauseText}
-            </p>
-            <Button 
-              onClick={handlePauseContinue}
-              className="font-lato font-semibold bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-mythical hover:shadow-divine transition-all duration-300"
-            >
-              Continuer le quiz
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+      <div className="min-h-screen bg-gradient-mythical">
+        {/* Header avec logo */}
+        <header className="w-full py-6 border-b border-cloud-white/20">
+          <div className="container mx-auto px-4">
+            <h1 className="text-center text-2xl font-cinzel font-bold text-cloud-white">
+              LA FABRIQUE PEPPS
+            </h1>
           </div>
-        </Card>
+        </header>
+        
+        <div className="flex items-center justify-center min-h-[calc(100vh-100px)] p-4">
+          <Card className="max-w-2xl w-full p-8 bg-cloud-white/95 backdrop-blur-sm shadow-divine border-primary/20">
+            <div className="text-center space-y-6">
+              <h2 className="text-2xl font-cinzel font-bold text-primary">Pause réflexive</h2>
+              <p className="text-lg text-primary/80 font-lato leading-relaxed">
+                {pauseText}
+              </p>
+              <Button 
+                onClick={handlePauseContinue}
+                className="font-lato font-semibold bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-mythical hover:shadow-divine transition-all duration-300"
+              >
+                Continuer le quiz
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-mythical p-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header avec navigation */}
-        <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="text-cloud-white hover:text-primary hover:bg-cloud-white/20"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
-          </Button>
-          
-          <div className="text-cloud-white font-lato">
-            Question {currentQuestion + 1} sur {totalQuestions}
-          </div>
+    <div className="min-h-screen bg-gradient-mythical">
+      {/* Header avec logo */}
+      <header className="w-full py-6 border-b border-cloud-white/20">
+        <div className="container mx-auto px-4">
+          <h1 className="text-center text-2xl font-cinzel font-bold text-cloud-white">
+            LA FABRIQUE PEPPS
+          </h1>
         </div>
+      </header>
 
-        {/* Barre de progression */}
-        <div className="space-y-2">
-          <Progress value={progress} className="w-full h-3 bg-primary/20" />
-          <div className="text-center text-cloud-white/80 text-sm font-lato">
-            {Math.round(progress)}% complété
-          </div>
-        </div>
-
-        {/* Question */}
-        <Card className="p-8 bg-cloud-white/95 backdrop-blur-sm shadow-divine border-primary/20">
-          <div className="text-center space-y-8">
-            <h2 className="text-2xl font-cinzel font-bold text-primary">
-              {currentQuestionData?.text}
-            </h2>
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-100px)] p-4">
+        <div className="max-w-4xl w-full space-y-6">
+          {/* Navigation header */}
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/")}
+              className="text-cloud-white hover:text-primary hover:bg-cloud-white/20"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour
+            </Button>
             
-            <p className="text-primary/70 font-lato">
-              Dans quelle mesure cette affirmation vous correspond-elle ?
-            </p>
-
-            {/* Échelle de réponse avec images */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-8">
-              {responseImages.map((response) => (
-                <div
-                  key={response.id}
-                  onClick={() => handleAnswerSelect(currentQuestionData.id, response.id)}
-                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                    currentAnswer === response.id 
-                      ? 'ring-4 ring-primary ring-offset-4 ring-offset-cloud-white' 
-                      : ''
-                  }`}
-                >
-                  <div className="text-center space-y-3">
-                    <div className="relative group">
-                      <img
-                        src={response.src}
-                        alt={response.label}
-                        className="w-24 h-24 mx-auto rounded-full shadow-mythical group-hover:shadow-divine transition-all duration-300"
-                      />
-                      {currentAnswer === response.id && (
-                        <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
-                      )}
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-sm font-lato font-medium text-primary">
-                        {response.label}
-                      </p>
-                      <p className="text-xs text-primary/60 font-cinzel">
-                        {response.description}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="text-cloud-white font-lato">
+              Question {currentQuestion + 1} sur {totalQuestions}
             </div>
           </div>
-        </Card>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentQuestion === 0}
-            className="font-lato border-cloud-white/30 text-cloud-white hover:bg-cloud-white/20 hover:border-cloud-white/50"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Précédent
-          </Button>
+          {/* Barre de progression */}
+          <div className="space-y-2">
+            <Progress value={progress} className="w-full h-3 bg-primary/20" />
+            <div className="text-center text-cloud-white/80 text-sm font-lato">
+              {Math.round(progress)}% complété
+            </div>
+          </div>
 
-          <Button
-            onClick={handleNext}
-            disabled={!currentAnswer}
-            className="font-lato font-semibold bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-mythical hover:shadow-divine transition-all duration-300 disabled:opacity-50"
-          >
-            Suivant
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          {/* Question */}
+          <Card className="p-8 bg-cloud-white/95 backdrop-blur-sm shadow-divine border-primary/20">
+            <div className="text-center space-y-8">
+              <h2 className="text-2xl font-cinzel font-bold text-primary">
+                {currentQuestionData?.text}
+              </h2>
+              
+              <p className="text-primary/70 font-lato">
+                Dans quelle mesure cette affirmation vous correspond-elle ?
+              </p>
+
+              {/* Échelle de réponse avec images */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-8">
+                {responseImages.map((response) => (
+                  <div
+                    key={response.id}
+                    onClick={() => handleAnswerSelect(currentQuestionData.id, response.id)}
+                    className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+                      currentAnswer === response.id 
+                        ? 'ring-4 ring-primary ring-offset-4 ring-offset-cloud-white' 
+                        : ''
+                    }`}
+                  >
+                    <div className="text-center space-y-3">
+                      <div className="relative group">
+                        <img
+                          src={response.src}
+                          alt={response.label}
+                          className="w-24 h-24 mx-auto rounded-full shadow-mythical group-hover:shadow-divine transition-all duration-300"
+                        />
+                        {currentAnswer === response.id && (
+                          <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
+                        )}
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-lato font-medium text-primary">
+                          {response.label}
+                        </p>
+                        <p className="text-xs text-primary/60 font-cinzel">
+                          {response.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Navigation */}
+          <div className="flex justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={currentQuestion === 0}
+              className="font-lato border-cloud-white/30 text-cloud-white hover:bg-cloud-white/20 hover:border-cloud-white/50"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Précédent
+            </Button>
+
+            <Button
+              onClick={handleNext}
+              disabled={!currentAnswer}
+              className="font-lato font-semibold bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-mythical hover:shadow-divine transition-all duration-300 disabled:opacity-50"
+            >
+              Suivant
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
