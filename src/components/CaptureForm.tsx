@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { GoogleAuthButton } from "@/components/GoogleAuthButton";
+
 
 export const CaptureForm = () => {
   const [formData, setFormData] = useState({
@@ -94,14 +94,6 @@ export const CaptureForm = () => {
           />
         </div>
 
-        <div className="flex flex-col items-center space-y-4 py-4">
-          <div className="flex items-center space-x-4 w-full">
-            <div className="flex-1 h-px bg-muted"></div>
-            <span className="font-lato text-sm text-muted-foreground">ou</span>
-            <div className="flex-1 h-px bg-muted"></div>
-          </div>
-          <GoogleAuthButton />
-        </div>
 
         <div className="flex items-start space-x-3 p-4 bg-cloud-white/50 rounded-lg">
           <Checkbox
