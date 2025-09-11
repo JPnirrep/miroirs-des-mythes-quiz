@@ -41,140 +41,140 @@ const responseImages = [
 
 // Questions complètes du quiz - 24 questions explorant les 4 archétypes
 const questions = [
-  // Questions Athéna - La Stratège Sage (6 questions)
+  // Questions Orphée - L'Artiste Visionnaire (6 questions)
   {
     id: 1,
-    text: "Je prends facilement des décisions importantes sans hésiter longtemps.",
-    archetype: "athena"
+    text: "Les histoires touchantes (films, livres, récits personnels) me transportent et peuvent facilement me faire monter les larmes aux yeux.",
+    archetype: "orphee"
   },
   {
     id: 2,
-    text: "J'aime analyser les situations sous tous les angles avant d'agir.",
+    text: "Avant de présenter une idée importante, j'aime explorer tous les angles et peser le pour et le contre en détail.",
     archetype: "athena"
   },
   {
     id: 3,
-    text: "Je suis souvent celui/celle vers qui on se tourne pour des conseils.",
-    archetype: "athena"
+    text: "Je suis très sensible aux atmosphères et je peux sentir immédiatement si l'ambiance d'un lieu est tendue ou détendue.",
+    archetype: "cassandre"
   },
   {
     id: 4,
-    text: "Je préfère planifier méticuleusement plutôt qu'improviser.",
-    archetype: "athena"
+    text: "Face à l'agitation ou au bruit, je sais instinctivement comment créer un espace de calme à l'intérieur de moi.",
+    archetype: "hestia"
   },
   {
     id: 5,
-    text: "Je sais rester calme et objective même dans les situations de crise.",
-    archetype: "athena"
+    text: "Je préfère largement improviser plutôt que de passer beaucoup de temps à préparer mes interventions.",
+    archetype: "orphee"
   },
   {
     id: 6,
-    text: "J'aime apprendre de nouvelles compétences pour développer mon expertise.",
-    archetype: "athena"
-  },
-
-  // Questions Orphée - L'Artiste Visionnaire (6 questions)
-  {
-    id: 7,
-    text: "Je m'exprime naturellement à travers l'art, la musique ou l'écriture.",
-    archetype: "orphee"
-  },
-  {
-    id: 8,
-    text: "Je ressens profondément les émotions des autres et de mon environnement.",
-    archetype: "orphee"
-  },
-  {
-    id: 9,
-    text: "Je cherche constamment de nouvelles expériences créatives.",
-    archetype: "orphee"
-  },
-  {
-    id: 10,
-    text: "J'ai souvent des idées originales qui sortent de l'ordinaire.",
-    archetype: "orphee"
-  },
-  {
-    id: 11,
-    text: "Je crois que l'art peut changer le monde et toucher les âmes.",
-    archetype: "orphee"
-  },
-  {
-    id: 12,
-    text: "Je me sens incompris(e) quand les autres ne saisissent pas ma vision.",
-    archetype: "orphee"
+    text: "Après une journée très active ou sociale, un moment de solitude n'est pas un luxe, c'est une nécessité vitale pour me recharger.",
+    archetype: "hestia"
   },
 
   // Questions Cassandre - La Visionnaire Incomprise (6 questions)
   {
-    id: 13,
-    text: "J'ai souvent des intuitions qui se révèlent exactes par la suite.",
+    id: 7,
+    text: "Je ressens intensément les émotions des autres, parfois comme si elles étaient les miennes.",
     archetype: "cassandre"
   },
   {
+    id: 8,
+    text: "Les subtilités et les détails d'une situation ont tendance à m'échapper.",
+    archetype: "orphee"
+  },
+  {
+    id: 9,
+    text: "Je suis très conscient(e) de mes limites et je sais quand il est temps pour moi de faire une pause pour rester efficace.",
+    archetype: "hestia"
+  },
+  {
+    id: 10,
+    text: "Les critiques négatives me touchent profondément et peuvent occuper mes pensées pendant un certain temps.",
+    archetype: "cassandre"
+  },
+  {
+    id: 11,
+    text: "Je perçois intuitivement les \"non-dits\" dans une conversation, juste en observant le langage corporel.",
+    archetype: "cassandre"
+  },
+  {
+    id: 12,
+    text: "On me dit souvent que j'ai un talent pour expliquer des choses compliquées de manière simple et claire.",
+    archetype: "athena"
+  },
+
+  // Questions Athéna - La Stratège Sage (6 questions)
+  {
+    id: 13,
+    text: "Je puise mon énergie dans les environnements très stimulants et je m'y sens parfaitement à l'aise pendant des heures.",
+    archetype: "orphee"
+  },
+  {
     id: 14,
-    text: "Je perçois des choses que les autres ne voient pas ou ignorent.",
+    text: "Les micro-expressions du visage et les non-dits dans son langage corporel captent particulièrement mon attention.",
     archetype: "cassandre"
   },
   {
     id: 15,
-    text: "Je n'hésite pas à exprimer mes opinions même si elles dérangent.",
-    archetype: "cassandre"
+    text: "Quand j'écoute quelqu'un parler, ce qui capte le plus mon attention, c'est la passion et la sincérité qui se dégagent de sa voix.",
+    archetype: "orphee"
   },
   {
     id: 16,
-    text: "Je sens quand quelque chose ne va pas, même sans preuves concrètes.",
-    archetype: "cassandre"
+    text: "L'analyse approfondie d'un sujet m'aide à me sentir plus en sécurité avant d'en parler.",
+    archetype: "athena"
   },
   {
     id: 17,
-    text: "Je me sens souvent en décalage avec mon époque ou mon environnement.",
-    archetype: "cassandre"
+    text: "Un environnement esthétiquement beau et harmonieux a un effet direct et positif sur mon bien-être.",
+    archetype: "hestia"
   },
   {
     id: 18,
-    text: "Je préfère dire la vérité même si elle est difficile à entendre.",
-    archetype: "cassandre"
+    text: "Je prends le temps de m'ancrer et de me recentrer avant un événement important ou une prise de parole.",
+    archetype: "hestia"
   },
 
   // Questions Hestia - La Gardienne du Foyer (6 questions)
   {
     id: 19,
-    text: "J'aime créer des espaces chaleureux et accueillants pour les autres.",
-    archetype: "hestia"
+    text: "Je me sens contraint(e) et peu créatif(ve) lorsque je dois suivre un plan trop détaillé.",
+    archetype: "orphee"
   },
   {
     id: 20,
-    text: "Je trouve du bonheur dans les petits gestes du quotidien.",
-    archetype: "hestia"
+    text: "Ma plus grande peur en m'exprimant est de paraître froid(e) ou déconnecté(e) de mon message.",
+    archetype: "orphee"
   },
   {
     id: 21,
-    text: "J'aime aider les autres même quand cela me demande des sacrifices personnels.",
-    archetype: "hestia"
+    text: "Ma plus grande peur en présentant mes idées est de perdre le fil ou de présenter quelque chose d'imprécis.",
+    archetype: "athena"
   },
   {
     id: 22,
-    text: "Je privilégie l'harmonie et évite les conflits quand c'est possible.",
-    archetype: "hestia"
+    text: "J'ai un \"sixième sens\" pour deviner l'humeur d'une personne, même si elle essaie de la cacher.",
+    archetype: "cassandre"
   },
   {
     id: 23,
-    text: "Je me sens responsable du bien-être de mon entourage.",
+    text: "Après une conversation émotionnellement chargée, j'ai besoin d'un moment pour \"digérer\" et retrouver mon calme.",
     archetype: "hestia"
   },
   {
     id: 24,
-    text: "Je trouve ma force dans la stabilité et la continuité.",
-    archetype: "hestia"
+    text: "Ma plus grande crainte avant une intervention est de me sentir submergé(e) par l'anxiété au point de perdre tes moyens.",
+    archetype: "athena"
   }
 ];
 
 // Textes de pause
 const pauseTexts = {
-  6: "Vous progressez bien ! Prenez un moment pour réfléchir à vos réponses jusqu'ici. Les questions suivantes exploreront d'autres aspects de votre personnalité.",
-  12: "À mi-parcours ! Vos réponses commencent à dessiner un profil unique. Continuons à explorer les différentes facettes de qui vous êtes.",
-  18: "Presque terminé ! Les dernières questions vont affiner votre profil archétypal. Restez authentique dans vos réponses."
+  6: "Petite pause! Respirez un coup. Vous faites ça très bien. On continue ?",
+  12: "Super! La moitié du chemin est faite. Prenez une gorgée d'eau, et c'est reparti !",
+  18: "On y est presque ! Plus que quelques questions pour découvrir votre profil unique."
 };
 
 export default function Quiz() {
