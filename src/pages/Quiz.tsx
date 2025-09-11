@@ -39,22 +39,134 @@ const responseImages = [
   }
 ];
 
-// Questions du quiz (aperçu des 3 premières)
+// Questions complètes du quiz - 24 questions explorant les 4 archétypes
 const questions = [
+  // Questions Athéna - La Stratège Sage (6 questions)
   {
     id: 1,
     text: "Je prends facilement des décisions importantes sans hésiter longtemps.",
-    archetype: "leader"
+    archetype: "athena"
   },
   {
     id: 2,
-    text: "J'aime aider les autres même quand cela me demande des sacrifices personnels.",
-    archetype: "caregiver"
+    text: "J'aime analyser les situations sous tous les angles avant d'agir.",
+    archetype: "athena"
   },
   {
     id: 3,
-    text: "Je cherche constamment de nouvelles expériences et adventures.",
-    archetype: "explorer"
+    text: "Je suis souvent celui/celle vers qui on se tourne pour des conseils.",
+    archetype: "athena"
+  },
+  {
+    id: 4,
+    text: "Je préfère planifier méticuleusement plutôt qu'improviser.",
+    archetype: "athena"
+  },
+  {
+    id: 5,
+    text: "Je sais rester calme et objective même dans les situations de crise.",
+    archetype: "athena"
+  },
+  {
+    id: 6,
+    text: "J'aime apprendre de nouvelles compétences pour développer mon expertise.",
+    archetype: "athena"
+  },
+
+  // Questions Orphée - L'Artiste Visionnaire (6 questions)
+  {
+    id: 7,
+    text: "Je m'exprime naturellement à travers l'art, la musique ou l'écriture.",
+    archetype: "orphee"
+  },
+  {
+    id: 8,
+    text: "Je ressens profondément les émotions des autres et de mon environnement.",
+    archetype: "orphee"
+  },
+  {
+    id: 9,
+    text: "Je cherche constamment de nouvelles expériences créatives.",
+    archetype: "orphee"
+  },
+  {
+    id: 10,
+    text: "J'ai souvent des idées originales qui sortent de l'ordinaire.",
+    archetype: "orphee"
+  },
+  {
+    id: 11,
+    text: "Je crois que l'art peut changer le monde et toucher les âmes.",
+    archetype: "orphee"
+  },
+  {
+    id: 12,
+    text: "Je me sens incompris(e) quand les autres ne saisissent pas ma vision.",
+    archetype: "orphee"
+  },
+
+  // Questions Cassandre - La Visionnaire Incomprise (6 questions)
+  {
+    id: 13,
+    text: "J'ai souvent des intuitions qui se révèlent exactes par la suite.",
+    archetype: "cassandre"
+  },
+  {
+    id: 14,
+    text: "Je perçois des choses que les autres ne voient pas ou ignorent.",
+    archetype: "cassandre"
+  },
+  {
+    id: 15,
+    text: "Je n'hésite pas à exprimer mes opinions même si elles dérangent.",
+    archetype: "cassandre"
+  },
+  {
+    id: 16,
+    text: "Je sens quand quelque chose ne va pas, même sans preuves concrètes.",
+    archetype: "cassandre"
+  },
+  {
+    id: 17,
+    text: "Je me sens souvent en décalage avec mon époque ou mon environnement.",
+    archetype: "cassandre"
+  },
+  {
+    id: 18,
+    text: "Je préfère dire la vérité même si elle est difficile à entendre.",
+    archetype: "cassandre"
+  },
+
+  // Questions Hestia - La Gardienne du Foyer (6 questions)
+  {
+    id: 19,
+    text: "J'aime créer des espaces chaleureux et accueillants pour les autres.",
+    archetype: "hestia"
+  },
+  {
+    id: 20,
+    text: "Je trouve du bonheur dans les petits gestes du quotidien.",
+    archetype: "hestia"
+  },
+  {
+    id: 21,
+    text: "J'aime aider les autres même quand cela me demande des sacrifices personnels.",
+    archetype: "hestia"
+  },
+  {
+    id: 22,
+    text: "Je privilégie l'harmonie et évite les conflits quand c'est possible.",
+    archetype: "hestia"
+  },
+  {
+    id: 23,
+    text: "Je me sens responsable du bien-être de mon entourage.",
+    archetype: "hestia"
+  },
+  {
+    id: 24,
+    text: "Je trouve ma force dans la stabilité et la continuité.",
+    archetype: "hestia"
   }
 ];
 
@@ -115,7 +227,7 @@ export default function Quiz() {
     const pauseText = pauseTexts[currentQuestion + 1 as keyof typeof pauseTexts];
     
     return (
-      <div className="min-h-screen bg-gradient-mythical">
+    <div className="min-h-screen bg-gradient-joyful">
         {/* Header avec logo */}
         <header className="w-full py-6 border-b border-primary/20">
           <div className="container mx-auto px-4">
@@ -149,7 +261,7 @@ export default function Quiz() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-mythical">
+    <div className="min-h-screen bg-gradient-joyful">
       {/* Header avec logo */}
       <header className="w-full py-6 border-b border-primary/20">
         <div className="container mx-auto px-4">

@@ -23,6 +23,8 @@ All colors MUST be HSL.
     --gradient-divine: linear-gradient(135deg, hsl(var(--indigo-deep)), hsl(var(--sky-blue)));
     --gradient-ethereal: linear-gradient(180deg, hsl(var(--cloud-white)), hsl(var(--soothing-aqua)));
     --gradient-golden: linear-gradient(135deg, hsl(var(--solar-yellow)), hsl(358 86% 62%));
+    --gradient-mythical: linear-gradient(135deg, hsl(var(--sky-blue)) 0%, hsl(var(--soothing-aqua)) 50%, hsl(var(--solar-yellow)) 100%);
+    --gradient-joyful: linear-gradient(45deg, hsl(var(--solar-yellow)) 0%, hsl(201 71% 62%) 50%, hsl(var(--sky-blue)) 100%);
     
     /* Design System Mapping */
     --background: var(--cloud-white);
