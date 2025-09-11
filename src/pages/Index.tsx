@@ -32,15 +32,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-ethereal">
       {/* Header avec le logo */}
-      <header className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-12">
-          <div className="flex-1"></div>
-          <img 
-            src="/lovable-uploads/cd4bfa3a-267e-44c0-b24d-37363c1e5239.png" 
-            alt="La Fabrique PEPPS" 
-            className="h-20 animate-fade-in"
-          />
-          <div className="flex-1"></div>
+      <header className="w-full py-6 border-b border-primary/20">
+        <div className="container mx-auto px-4">
+          <h1 className="text-center text-2xl font-cinzel font-bold text-primary">
+            LA FABRIQUE PEPPS
+          </h1>
         </div>
       </header>
 
