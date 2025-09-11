@@ -203,104 +203,175 @@ const generatePDF = (
   const pdf = new jsPDF();
   const primaryData = archetypesData[profileAnalysis.primary];
   const secondaryData = profileAnalysis.secondary ? archetypesData[profileAnalysis.secondary] : null;
+  const growthData = archetypesData[profileAnalysis.lowestScore];
   const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
 
-  // En-tête
-  pdf.setFontSize(20);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Résultats Quiz PEPPS', 20, 30);
-  
-  if (userData) {
-    pdf.setFontSize(12);
-    pdf.text(`${userData.firstName} ${userData.lastName}`, 20, 45);
-    pdf.text(`${userData.email}`, 20, 55);
-  }
+  let yPosition = 30;
 
-  // Titre du profil
-  let yPosition = userData ? 70 : 50;
+  // Helper function pour le titre du profil (même logique que la page)
+  const getProfileTitle = () => {
+    switch (profileAnalysis.type) {
+      case 'dominant':
+        return `Votre Profil : ${primaryData.name}`;
+      case 'combine':
+        return `Votre Profil Combiné : ${primaryData.name} & ${secondaryData?.name}`;
+      case 'nuance':
+        return `Votre Profil Nuancé : ${primaryData.name}`;
+      default:
+        return `Votre Profil : ${primaryData.name}`;
+    }
+  };
+
+  // ===== HEADER =====
   pdf.setFontSize(16);
   pdf.setTextColor(51, 51, 102);
-  
-  const profileTitle = profileAnalysis.type === 'dominant' 
-    ? `Votre Profil : ${primaryData.name}`
-    : profileAnalysis.type === 'combine'
-    ? `Profil Combiné : ${primaryData.name} & ${secondaryData?.name}`
-    : `Profil Nuancé : ${primaryData.name}`;
-  
-  pdf.text(profileTitle, 20, yPosition);
+  pdf.text('La Fabrique PEPPS', 105, yPosition, { align: 'center' });
   yPosition += 20;
 
-  // Profil principal
-  pdf.setFontSize(14);
+  // Données utilisateur
+  if (userData) {
+    pdf.setFontSize(12);
+    pdf.setTextColor(102, 102, 153);
+    pdf.text(`${userData.firstName} ${userData.lastName} - ${userData.email}`, 105, yPosition, { align: 'center' });
+    yPosition += 15;
+  }
+
+  // ===== TITRE PRINCIPAL =====
+  pdf.setFontSize(18);
   pdf.setTextColor(51, 51, 102);
-  pdf.text(`${primaryData.name} - ${primaryData.subtitle}`, 20, yPosition);
+  const profileTitle = getProfileTitle();
+  pdf.text(profileTitle, 105, yPosition, { align: 'center' });
+  yPosition += 25;
+
+  // ===== PROFIL PRINCIPAL =====
+  pdf.setFontSize(16);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text(primaryData.name, 20, yPosition);
+  yPosition += 10;
+
+  pdf.setFontSize(14);
+  pdf.setTextColor(102, 102, 153);
+  pdf.text(primaryData.subtitle, 20, yPosition);
   yPosition += 15;
 
-  pdf.setFontSize(12);
-  pdf.setTextColor(102, 102, 153);
+  pdf.setFontSize(13);
+  pdf.setTextColor(51, 51, 102);
   pdf.text(primaryData.title, 20, yPosition);
   yPosition += 15;
 
-  // Description (avec gestion des retours à la ligne)
+  pdf.setFontSize(11);
+  pdf.setTextColor(80, 80, 80);
   const splitDescription = pdf.splitTextToSize(primaryData.description, 170);
   pdf.text(splitDescription, 20, yPosition);
-  yPosition += splitDescription.length * 6 + 10;
+  yPosition += splitDescription.length * 5 + 15;
 
-  // Déclics PEPPS
-  pdf.setFontSize(14);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Tes déclics PEPPS pour briller :', 20, yPosition);
-  yPosition += 15;
-
-  primaryData.declics.forEach((declic, index) => {
-    pdf.setFontSize(12);
+  // ===== PROFIL SECONDAIRE (si applicable) =====
+  if (secondaryData) {
+    pdf.setFontSize(16);
     pdf.setTextColor(51, 51, 102);
-    pdf.text(`${declic.title}`, 25, yPosition);
-    yPosition += 8;
-    
-    pdf.setTextColor(102, 102, 153);
-    const splitContent = pdf.splitTextToSize(declic.content, 165);
-    pdf.text(splitContent, 25, yPosition);
-    yPosition += splitContent.length * 6 + 8;
-  });
+    const secondaryTitle = profileAnalysis.type === 'combine' 
+      ? 'Votre Second Profil Dominant' 
+      : 'Votre Nuance Secondaire';
+    pdf.text(secondaryTitle, 20, yPosition);
+    yPosition += 15;
+
+    pdf.setFontSize(14);
+    pdf.text(`${secondaryData.name} - ${secondaryData.subtitle}`, 25, yPosition);
+    yPosition += 10;
+
+    pdf.setFontSize(12);
+    pdf.text(secondaryData.title, 25, yPosition);
+    yPosition += 10;
+
+    pdf.setFontSize(10);
+    pdf.setTextColor(80, 80, 80);
+    const splitSecondaryDesc = pdf.splitTextToSize(secondaryData.description, 165);
+    pdf.text(splitSecondaryDesc, 25, yPosition);
+    yPosition += splitSecondaryDesc.length * 4 + 15;
+  }
 
   // Nouvelle page si nécessaire
-  if (yPosition > 250) {
+  if (yPosition > 220) {
     pdf.addPage();
     yPosition = 30;
   }
 
-  // Scores détaillés
+  // ===== DÉCLICS PEPPS =====
+  pdf.setFontSize(16);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Tes déclics PEPPS pour briller', 20, yPosition);
+  yPosition += 20;
+
+  primaryData.declics.forEach((declic, index) => {
+    pdf.setFontSize(12);
+    pdf.setTextColor(51, 51, 102);
+    pdf.text(`★ ${declic.title}`, 25, yPosition);
+    yPosition += 10;
+    
+    pdf.setFontSize(11);
+    pdf.setTextColor(80, 80, 80);
+    const splitContent = pdf.splitTextToSize(declic.content, 165);
+    pdf.text(splitContent, 25, yPosition);
+    yPosition += splitContent.length * 5 + 12;
+  });
+
+  // Nouvelle page si nécessaire
+  if (yPosition > 220) {
+    pdf.addPage();
+    yPosition = 30;
+  }
+
+  // ===== DÉCLIC DE CROISSANCE =====
+  pdf.setFontSize(16);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Votre "Déclic de Croissance"', 20, yPosition);
+  yPosition += 15;
+
+  pdf.setFontSize(12);
+  pdf.setTextColor(102, 102, 153);
+  pdf.text('Votre score le plus faible n\'est pas une faiblesse, c\'est votre plus belle opportunité d\'évolution !', 20, yPosition);
+  yPosition += 15;
+
   pdf.setFontSize(14);
   pdf.setTextColor(51, 51, 102);
-  pdf.text('Votre répartition complète :', 20, yPosition);
+  pdf.text(`${growthData.name} - ${growthData.subtitle}`, 25, yPosition);
+  yPosition += 15;
+
+  pdf.setFontSize(12);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Votre opportunité de croissance :', 25, yPosition);
+  yPosition += 10;
+  
+  pdf.setFontSize(11);
+  pdf.setTextColor(80, 80, 80);
+  const growthMessage = getGrowthMessage(profileAnalysis.lowestScore);
+  const splitGrowthMessage = pdf.splitTextToSize(growthMessage, 165);
+  pdf.text(splitGrowthMessage, 25, yPosition);
+  yPosition += splitGrowthMessage.length * 5 + 20;
+
+  // ===== RÉPARTITION COMPLÈTE =====
+  pdf.setFontSize(16);
+  pdf.setTextColor(51, 51, 102);
+  pdf.text('Votre Répartition Complète', 20, yPosition);
   yPosition += 20;
 
   Object.entries(archetypesData).forEach(([key, data]) => {
     const score = scores[key as keyof ArchetypeScore];
     const percentage = Math.round((score / totalScore) * 100);
+    const isPrimary = key === profileAnalysis.primary;
+    const isSecondary = key === profileAnalysis.secondary;
+    const isLowest = key === profileAnalysis.lowestScore;
     
+    let prefix = '';
+    if (isPrimary) prefix = '👑 ';
+    else if (isSecondary) prefix = '⭐ ';
+    else if (isLowest) prefix = '🎯 ';
+
     pdf.setFontSize(12);
     pdf.setTextColor(51, 51, 102);
-    pdf.text(`${data.name} (${data.subtitle}): ${score}/30 (${percentage}%)`, 25, yPosition);
+    pdf.text(`${prefix}${data.name} (${data.subtitle}): ${score}/30 (${percentage}%)`, 25, yPosition);
     yPosition += 8;
   });
-
-  // Déclic de croissance
-  yPosition += 10;
-  pdf.setFontSize(14);
-  pdf.setTextColor(51, 51, 102);
-  pdf.text('Votre déclic de croissance :', 20, yPosition);
-  yPosition += 15;
-
-  const growthData = archetypesData[profileAnalysis.lowestScore];
-  pdf.setFontSize(12);
-  pdf.text(`${growthData.name} - ${growthData.subtitle}`, 25, yPosition);
-  yPosition += 10;
-  
-  const growthMessage = getGrowthMessage(profileAnalysis.lowestScore);
-  const splitGrowthMessage = pdf.splitTextToSize(growthMessage, 165);
-  pdf.text(splitGrowthMessage, 25, yPosition);
 
   // Télécharger le PDF
   const fileName = userData 
