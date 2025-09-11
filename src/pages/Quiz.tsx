@@ -117,11 +117,13 @@ export default function Quiz() {
     return (
       <div className="min-h-screen bg-gradient-mythical">
         {/* Header avec logo */}
-        <header className="w-full py-6 border-b border-cloud-white/20">
+        <header className="w-full py-6 border-b border-primary/20">
           <div className="container mx-auto px-4">
-            <h1 className="text-center text-2xl font-cinzel font-bold text-cloud-white">
-              LA FABRIQUE PEPPS
-            </h1>
+            <img 
+              src="/lovable-uploads/10522b09-8aa7-4d45-aa5d-61907e365b88.png" 
+              alt="La Fabrique PEPPS" 
+              className="h-16 mx-auto"
+            />
           </div>
         </header>
         
@@ -149,11 +151,13 @@ export default function Quiz() {
   return (
     <div className="min-h-screen bg-gradient-mythical">
       {/* Header avec logo */}
-      <header className="w-full py-6 border-b border-cloud-white/20">
+      <header className="w-full py-6 border-b border-primary/20">
         <div className="container mx-auto px-4">
-          <h1 className="text-center text-2xl font-cinzel font-bold text-cloud-white">
-            LA FABRIQUE PEPPS
-          </h1>
+          <img 
+            src="/lovable-uploads/10522b09-8aa7-4d45-aa5d-61907e365b88.png" 
+            alt="La Fabrique PEPPS" 
+            className="h-16 mx-auto"
+          />
         </div>
       </header>
 
@@ -164,7 +168,7 @@ export default function Quiz() {
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="text-cloud-white hover:text-primary hover:bg-cloud-white/20"
+              className="text-primary hover:text-primary hover:bg-primary/10"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour

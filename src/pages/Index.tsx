@@ -34,9 +34,11 @@ const Index = () => {
       {/* Header avec le logo */}
       <header className="w-full py-6 border-b border-primary/20">
         <div className="container mx-auto px-4">
-          <h1 className="text-center text-2xl font-cinzel font-bold text-primary">
-            LA FABRIQUE PEPPS
-          </h1>
+          <img 
+            src="/lovable-uploads/10522b09-8aa7-4d45-aa5d-61907e365b88.png" 
+            alt="La Fabrique PEPPS" 
+            className="h-16 mx-auto"
+          />
         </div>
       </header>
 
