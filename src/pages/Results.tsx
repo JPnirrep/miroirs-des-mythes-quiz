@@ -774,15 +774,15 @@ export default function Results() {
                 <div className="webinar-benefits">
                   <div className="benefit-item">
                     <span className="benefit-icon">🔑</span>
-                    <span className="font-lato">Découvrez 3 clés concrètes, pensées spécifiquement pour vous.</span>
+                    <span className="font-lato"><strong>Comprendre le sens caché de votre sensibilité.</strong> Découvrez pourquoi votre "peur de déranger" n'est pas une faiblesse, mais la conséquence d'un super-pouvoir mal compris.</span>
                   </div>
                   <div className="benefit-item">
                     <span className="benefit-icon">💫</span>
-                    <span className="font-lato">Apprenez à gérer votre énergie pour communiquer avec impact, sans vous épuiser.</span>
+                    <span className="font-lato"><strong>Recevoir 3 "Déclics PEPPS" pour en faire votre boussole.</strong> Repartez avec des outils concrets et incarnés pour canaliser votre intensité et ne plus jamais la subir.</span>
                   </div>
                   <div className="benefit-item">
-                    <span className="benefit-icon">🎁</span>
-                    <span className="font-lato">Découvrez en avant-première le livret "Les Déclics PEPPS" et sa méthode unique.</span>
+                    <span className="benefit-icon">🎯</span>
+                    <span className="font-lato"><strong>Incarner enfin votre juste place, avec calme et impact.</strong> Apprenez la méthode pour vous sentir légitime et en sécurité, et faire de votre voix un instrument de connexion puissant.</span>
                   </div>
                 </div>
                 
