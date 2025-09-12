@@ -385,11 +385,39 @@ const addFooter = (pdf: jsPDF, pdfWidth: number, pdfHeight: number, margin: numb
   pdf.text(`Page ${pageNumber}`, pdfWidth - margin, footerY, { align: 'right' });
 };
 
+// Fonction pour obtenir le message de transition personnalisé
+const getTransitionMessage = (archetype: string) => {
+  const messages = {
+    athena: {
+      title: "En tant qu'Architecte de la Clarté...",
+      text: "Vous savez structurer les idées. Il est temps que votre message soit entendu avec autant d'impact que de logique."
+    },
+    orphee: {
+      title: "En tant qu'Enchanteur des Cœurs...",
+      text: "Votre émotion est votre plus grande force. Apprenez à la canaliser pour captiver votre auditoire sans vous épuiser."
+    },
+    cassandre: {
+      title: "En tant que Vigie des Signaux Faibles...",
+      text: "Votre intuition est un radar. Découvrez comment l'utiliser pour ajuster votre parole et créer une connexion infaillible."
+    },
+    hestia: {
+      title: "En tant que Gardien du Calme...",
+      text: "Votre sérénité est contagieuse. Voyons ensemble comment rayonner cette force tranquille sur toutes les scènes de votre vie."
+    }
+  };
+  
+  return messages[archetype as keyof typeof messages] || {
+    title: "Maintenant que vous connaissez mieux vos forces...",
+    text: "Il est temps de transformer votre sensibilité en votre plus grand atout à l'oral. Découvrez comment passer de la peur de déranger à la joie de vous exprimer authentiquement."
+  };
+};
+
 export default function Results() {
   const navigate = useNavigate();
   const [scores, setScores] = useState<ArchetypeScore>({ athena: 0, orphee: 0, cassandre: 0, hestia: 0 });
   const [profileAnalysis, setProfileAnalysis] = useState<ProfileAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showWebinarSection, setShowWebinarSection] = useState(false);
 
   useEffect(() => {
     const calculateResults = () => {
@@ -410,6 +438,11 @@ export default function Results() {
       setScores(calculatedScores);
       setProfileAnalysis(analysis);
       setIsLoading(false);
+      
+      // Afficher la section webinaire après 2 secondes
+      setTimeout(() => {
+        setShowWebinarSection(true);
+      }, 2000);
     };
 
     // Délai pour simuler le calcul
@@ -714,6 +747,67 @@ export default function Results() {
             })}
           </div>
         </section>
+
+        {/* Section CTA Webinaire */}
+        {showWebinarSection && (
+          <section className="webinar-transition-section max-w-4xl mx-auto">
+            {/* Message de transition personnalisé */}
+            <div className="transition-message">
+              <h3 className="font-cinzel font-bold">
+                {getTransitionMessage(profileAnalysis.primary).title}
+              </h3>
+              <p className="font-lato text-primary/80">
+                {getTransitionMessage(profileAnalysis.primary).text}
+              </p>
+            </div>
+
+            {/* Card webinaire */}
+            <div className="webinar-card">
+              <div className="webinar-header">
+                <h4 className="font-poppins">✨ Webinaire Inédit pour Voix Sensibles & Ambitieuses</h4>
+                <div className="webinar-badge font-poppins">VOTRE ACCÈS OFFERT</div>
+              </div>
+              
+              <div className="webinar-content">
+                <h5 className="font-cinzel">"Passer de la peur de déranger à la joie de t'exprimer"</h5>
+                
+                <div className="webinar-benefits">
+                  <div className="benefit-item">
+                    <span className="benefit-icon">🔑</span>
+                    <span className="font-lato">Découvrez 3 clés concrètes, pensées spécifiquement pour vous.</span>
+                  </div>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">💫</span>
+                    <span className="font-lato">Apprenez à gérer votre énergie pour communiquer avec impact, sans vous épuiser.</span>
+                  </div>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">🎁</span>
+                    <span className="font-lato">Découvrez en avant-première le livret "Les Déclics PEPPS" et sa méthode unique.</span>
+                  </div>
+                </div>
+                
+                <div className="webinar-urgency">
+                  <p className="font-lato"><strong>🗓️ Session live :</strong> Mardi 7 octobre · De 10:00 à 12:00 (Europe/Paris)</p>
+                  <p className="font-lato">Les places sont limitées pour garantir la qualité des échanges.</p>
+                </div>
+              </div>
+
+              <div className="webinar-cta">
+                <button 
+                  className="webinar-signup-btn font-poppins"
+                  onClick={() => window.open('https://meet.google.com/hnt-uosa-ocf', '_blank')}
+                >
+                  <span className="btn-text">Je réserve ma place offerte</span>
+                  <span className="btn-icon">✨</span>
+                </button>
+                
+                <p className="webinar-disclaimer font-lato">
+                  Inscription 100% gratuite. Les participants recevront une offre exclusive pour acquérir le livret et un accompagnement personnalisé.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Actions */}
         <section data-actions-section className="text-center space-y-6">
