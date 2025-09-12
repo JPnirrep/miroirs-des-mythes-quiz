@@ -245,8 +245,8 @@ const generatePDF = async (
     const imgHeight = canvas.height;
     const ratio = imgWidth / imgHeight;
     
-    // Adapter l'image au format PDF
-    let scaledWidth = contentWidth;
+    // Adapter l'image au format PDF et augmenter de 20% pour meilleure lisibilité
+    let scaledWidth = contentWidth * 1.2;
     let scaledHeight = scaledWidth / ratio;
     
     // Si l'image est trop haute, l'adapter
