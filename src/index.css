@@ -103,3 +103,92 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Webinar Section Styles */
+@layer components {
+  .webinar-transition-section {
+    @apply max-w-4xl mx-auto mb-12;
+  }
+
+  .webinar-card {
+    @apply bg-gradient-to-br from-accent/20 to-secondary/20 border border-accent rounded-lg p-8 shadow-divine;
+  }
+
+  .webinar-header {
+    @apply text-center mb-6;
+  }
+
+  .webinar-header h4 {
+    @apply text-3xl font-bold text-primary mb-4;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .webinar-badge {
+    @apply inline-block bg-gradient-golden text-primary-foreground px-4 py-2 rounded-full text-sm font-semibold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .webinar-content h5 {
+    @apply text-xl text-primary font-semibold mb-6 text-center;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .webinar-benefits {
+    @apply space-y-4 mb-6;
+  }
+
+  .benefit-item {
+    @apply flex items-start gap-3 bg-white/10 rounded-lg p-4;
+  }
+
+  .benefit-icon {
+    @apply text-2xl flex-shrink-0;
+  }
+
+  .benefit-item span:last-child {
+    @apply text-primary/90 leading-relaxed;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .webinar-urgency {
+    @apply bg-gradient-to-r from-accent/20 to-secondary/20 rounded-xl p-6 border border-accent/30 text-center mb-6;
+  }
+
+  .webinar-urgency p {
+    @apply text-primary mb-2;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .webinar-urgency p:first-child {
+    @apply font-semibold;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .webinar-cta {
+    @apply text-center space-y-4;
+  }
+
+  .webinar-signup-btn {
+    @apply inline-flex items-center gap-2 bg-gradient-divine hover:bg-gradient-golden text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg shadow-divine hover:shadow-mythical transition-all duration-300 transform hover:scale-105;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .webinar-disclaimer {
+    @apply text-sm text-primary/60 max-w-md mx-auto;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .transition-message {
+    @apply text-center mb-8;
+  }
+
+  .transition-message h3 {
+    @apply text-2xl font-bold text-primary mb-4;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .transition-message p {
+    @apply text-primary/80;
+    font-family: 'Lato', sans-serif;
+  }
+}
