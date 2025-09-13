@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, RotateCcw, Crown, Sparkles, Star, Target, Download } from "lucide-react";
 import jsPDF from "jspdf";
@@ -38,12 +37,12 @@ interface ProfileAnalysis {
   lowestScore: string;
 }
 
-// Questions mapping selon la Source de Vérité
+// Questions mapping selon les nouvelles consignes
 const questionMapping = {
-  athena: [2, 5, 10, 15, 19, 23], // Architecte (Athéna)
-  orphee: [1, 4, 6, 11, 17, 21], // Enchanteur (Orphée)
-  cassandre: [8, 12, 14, 16, 20, 26], // Vigie (Cassandre)
-  hestia: [3, 7, 9, 13, 18, 22] // Gardien du Foyer (Hestia)
+  orphee: [1, 7, 10, 15, 20, 23], // Cœur Vibrant
+  athena: [2, 5, 12, 16, 19, 21], // Phare de Clarté
+  cassandre: [3, 8, 11, 14, 17, 22], // Antenne Subtile
+  hestia: [4, 6, 9, 13, 18, 24] // Force Tranquille
 };
 
 // Questions inversées
@@ -52,7 +51,7 @@ const reversedQuestions = [5, 8, 13, 19];
 const archetypesData: Record<string, ArchetypeData> = {
   athena: {
     key: "athena",
-    name: "L'Architecte (Athéna)",
+    name: "L'Architecte",
     subtitle: "Phare de Clarté",
     image: athenaImage,
     title: "Ton pouvoir caché : L'Architecte de la Clarté",
@@ -70,7 +69,7 @@ const archetypesData: Record<string, ArchetypeData> = {
   },
   orphee: {
     key: "orphee",
-    name: "L'Enchanteur (Orphée)",
+    name: "L'Enchanteur",
     subtitle: "Cœur Vibrant",
     image: orpheeImage,
     title: "Ton pouvoir caché : L'Enchanteur des Cœurs",
@@ -88,7 +87,7 @@ const archetypesData: Record<string, ArchetypeData> = {
   },
   cassandre: {
     key: "cassandre",
-    name: "La Vigie (Cassandre)",
+    name: "La Vigie",
     subtitle: "Antenne Subtile",
     image: cassandreImage,
     title: "Ton pouvoir caché : La Vigie des Signaux Faibles",
@@ -106,7 +105,7 @@ const archetypesData: Record<string, ArchetypeData> = {
   },
   hestia: {
     key: "hestia",
-    name: "Le Gardien du Foyer (Estia)",
+    name: "Le Gardien du Foyer",
     subtitle: "Force Tranquille",
     image: hestiaImage,
     title: "Ton pouvoir caché : Le Gardien du Calme",
@@ -246,8 +245,8 @@ const generatePDF = async (
     const imgHeight = canvas.height;
     const ratio = imgWidth / imgHeight;
     
-    // Adapter l'image au format PDF et augmenter de 20% pour meilleure lisibilité
-    let scaledWidth = contentWidth * 1.2;
+    // Adapter l'image au format PDF
+    let scaledWidth = contentWidth;
     let scaledHeight = scaledWidth / ratio;
     
     // Si l'image est trop haute, l'adapter
@@ -386,40 +385,11 @@ const addFooter = (pdf: jsPDF, pdfWidth: number, pdfHeight: number, margin: numb
   pdf.text(`Page ${pageNumber}`, pdfWidth - margin, footerY, { align: 'right' });
 };
 
-// Fonction pour obtenir le message de transition personnalisé
-const getTransitionMessage = (archetype: string) => {
-  const messages = {
-    athena: {
-      title: "En tant qu'Architecte de la Clarté (Athéna)...",
-      text: "Vous savez structurer les idées. Il est temps que votre message soit entendu avec autant d'impact que de logique."
-    },
-    orphee: {
-      title: "En tant qu'Enchanteur des Cœurs (Orphée)...",
-      text: "Votre émotion est votre plus grande force. Apprenez à la canaliser pour captiver votre auditoire sans vous épuiser."
-    },
-    cassandre: {
-      title: "En tant que Vigie des Signaux Faibles (Cassandre)...",
-      text: "Votre intuition est un radar. Découvrez comment l'utiliser pour ajuster votre parole et créer une connexion infaillible."
-    },
-    hestia: {
-      title: "En tant que Gardien du Calme (Estia)...",
-      text: "Votre sérénité est contagieuse. Voyons ensemble comment rayonner cette force tranquille sur toutes les scènes de votre vie."
-    }
-  };
-  
-  return messages[archetype as keyof typeof messages] || {
-    title: "Maintenant que vous connaissez mieux vos forces...",
-    text: "Il est temps de transformer votre sensibilité en votre plus grand atout à l'oral. Découvrez comment passer de la peur de déranger à la joie de vous exprimer authentiquement."
-  };
-};
-
 export default function Results() {
   const navigate = useNavigate();
   const [scores, setScores] = useState<ArchetypeScore>({ athena: 0, orphee: 0, cassandre: 0, hestia: 0 });
   const [profileAnalysis, setProfileAnalysis] = useState<ProfileAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [showWebinarSection, setShowWebinarSection] = useState(false);
-  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
 
   useEffect(() => {
     const calculateResults = () => {
@@ -440,11 +410,6 @@ export default function Results() {
       setScores(calculatedScores);
       setProfileAnalysis(analysis);
       setIsLoading(false);
-      
-      // Afficher la section webinaire après 2 secondes
-      setTimeout(() => {
-        setShowWebinarSection(true);
-      }, 2000);
     };
 
     // Délai pour simuler le calcul
@@ -750,69 +715,6 @@ export default function Results() {
           </div>
         </section>
 
-        {/* Section CTA Webinaire */}
-        {showWebinarSection && (
-          <section className="webinar-transition-section max-w-4xl mx-auto">
-            {/* Message de transition personnalisé */}
-            <div className="transition-message">
-              <h3 className="font-cinzel font-bold">
-                {getTransitionMessage(profileAnalysis.primary).title}
-              </h3>
-              <p className="font-lato text-primary/80">
-                {getTransitionMessage(profileAnalysis.primary).text}
-              </p>
-            </div>
-
-            {/* Card webinaire */}
-            <div className="webinar-card">
-              <div className="webinar-header">
-                <h4 className="font-poppins">✨ Webinaire Inédit pour Voix Sensibles & Ambitieuses</h4>
-                <div className="webinar-badge font-poppins">VOTRE ACCÈS OFFERT</div>
-              </div>
-              
-              <div className="webinar-content">
-                <h5 className="font-cinzel">"Passer de la peur de déranger à la joie de t'exprimer"</h5>
-                
-                <div className="webinar-benefits">
-                  <div className="benefit-item">
-                    <span className="benefit-icon">🔑</span>
-                    <span className="font-lato"><strong>Comprendre le sens caché de votre sensibilité.</strong> Découvrez pourquoi votre "peur de déranger" n'est pas une faiblesse, mais la conséquence d'un super-pouvoir mal compris.</span>
-                  </div>
-                  <div className="benefit-item">
-                    <span className="benefit-icon">💫</span>
-                    <span className="font-lato"><strong>Recevoir 3 "Déclics PEPPS" pour en faire votre boussole.</strong> Repartez avec des outils concrets et incarnés pour canaliser votre intensité et ne plus jamais la subir.</span>
-                  </div>
-                  <div className="benefit-item">
-                    <span className="benefit-icon">🎯</span>
-                    <span className="font-lato"><strong>Incarner enfin votre juste place, avec calme et impact.</strong> Apprenez la méthode pour vous sentir légitime et en sécurité, et faire de votre voix un instrument de connexion puissant.</span>
-                  </div>
-                </div>
-                
-                <div className="webinar-urgency">
-                  <p className="font-lato"><strong>🗓️ Session live :</strong> Mardi 7 octobre · De 10:00 à 12:00 (Europe/Paris)</p>
-                  <p className="font-lato">Les places sont limitées pour garantir la qualité des échanges.</p>
-                </div>
-              </div>
-
-              <div className="webinar-cta">
-                <button 
-                  className="webinar-signup-btn font-poppins"
-                  onClick={() => {
-                    setShowConfirmationDialog(true);
-                  }}
-                >
-                  <span className="btn-text">Je réserve ma place offerte</span>
-                  <span className="btn-icon">✨</span>
-                </button>
-                
-                <p className="webinar-disclaimer font-lato">
-                  Inscription 100% gratuite. Les participants recevront une offre exclusive pour acquérir le livret et un accompagnement personnalisé.
-                </p>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* Actions */}
         <section data-actions-section className="text-center space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-lg mx-auto">
@@ -831,8 +733,8 @@ export default function Results() {
                 const parsedUserData = userData ? JSON.parse(userData) : undefined;
                 generatePDF(profileAnalysis, scores, parsedUserData);
               }}
-              variant="outline"
-              className="font-lato border-primary text-primary hover:bg-primary hover:text-primary-foreground shadow-lg hover:shadow-mythical transition-all duration-300"
+              variant="secondary"
+              className="font-lato bg-accent hover:bg-accent/80 text-primary-foreground shadow-lg hover:shadow-mythical transition-all duration-300"
             >
               <Download className="w-4 h-4 mr-2" />
               Télécharger PDF
@@ -848,37 +750,6 @@ export default function Results() {
           </div>
         </section>
       </div>
-
-      {/* Dialog de confirmation */}
-      <Dialog open={showConfirmationDialog} onOpenChange={setShowConfirmationDialog}>
-        <DialogContent className="max-w-md bg-cloud-white border-accent/30">
-          <DialogHeader>
-            <DialogTitle className="font-cinzel text-primary text-center">
-              Merci pour votre inscription !
-            </DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="space-y-4">
-            <p className="font-lato text-primary/90 text-center leading-relaxed">
-              Je te remercie pour ton inscription. Tu vas recevoir dans les prochaines minutes un email de confirmation avec un mot d'accueil. Si tu ne l'as pas dans ta boite de réception, regarde dans tes spams. À Bientôt.
-            </p>
-            <p className="font-cinzel font-semibold text-primary text-center">
-              Sandrina
-            </p>
-          </DialogDescription>
-          <div className="flex justify-center pt-4">
-            <Button 
-              onClick={() => {
-                const googleCalendarUrl = 'https://www.google.com/calendar/render?action=TEMPLATE&text=Webinaire+Passer+de+la+peur+de+d%C3%A9ranger+%C3%A0+la+joie+de+t%27exprimer&dates=20251007T080000Z/20251007T100000Z&details=Webinaire+in%C3%A9dit+pour+voix+sensibles+et+ambitieuses%0A%0A%F0%9F%94%91+Comprendre+le+sens+cach%C3%A9+de+votre+sensibilit%C3%A9%0A%F0%9F%92%AB+Recevoir+3+D%C3%A9clics+PEPPS+concrets%0A%F0%9F%8E%AF+Incarner+enfin+votre+juste+place+avec+calme+et+impact%0A%0ALien+Google+Meet%3A+https%3A//meet.google.com/hnt-uosa-ocf&location=https://meet.google.com/hnt-uosa-ocf';
-                window.open(googleCalendarUrl, '_blank');
-                setShowConfirmationDialog(false);
-              }}
-              className="font-lato bg-gradient-divine hover:bg-gradient-golden text-primary-foreground"
-            >
-              Parfait !
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

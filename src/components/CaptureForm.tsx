@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 export const CaptureForm = () => {
   const [formData, setFormData] = useState({
     firstName: "",
-    lastName: "",
     email: "",
     rgpdConsent: false
   });
@@ -22,7 +21,7 @@ export const CaptureForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.firstName || !formData.email) {
       toast({
         title: "Informations manquantes",
         description: "Veuillez remplir tous les champs obligatoires.",
@@ -79,20 +78,6 @@ export const CaptureForm = () => {
             placeholder="Votre prénom"
             value={formData.firstName}
             onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-            className="font-lato border-2 border-muted focus:border-secondary transition-colors h-12"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="lastName" className="font-poppins font-medium text-primary">
-            Nom *
-          </Label>
-          <Input
-            id="lastName"
-            type="text"
-            placeholder="Votre nom"
-            value={formData.lastName}
-            onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
             className="font-lato border-2 border-muted focus:border-secondary transition-colors h-12"
           />
         </div>
