@@ -389,19 +389,19 @@ const addFooter = (pdf: jsPDF, pdfWidth: number, pdfHeight: number, margin: numb
 const getTransitionMessage = (archetype: string) => {
   const messages = {
     athena: {
-      title: "En tant qu'Architecte de la Clarté...",
+      title: "En tant qu'Architecte de la Clarté (Athéna)...",
       text: "Vous savez structurer les idées. Il est temps que votre message soit entendu avec autant d'impact que de logique."
     },
     orphee: {
-      title: "En tant qu'Enchanteur des Cœurs...",
+      title: "En tant qu'Enchanteur des Cœurs (Orphée)...",
       text: "Votre émotion est votre plus grande force. Apprenez à la canaliser pour captiver votre auditoire sans vous épuiser."
     },
     cassandre: {
-      title: "En tant que Vigie des Signaux Faibles...",
+      title: "En tant que Vigie des Signaux Faibles (Cassandre)...",
       text: "Votre intuition est un radar. Découvrez comment l'utiliser pour ajuster votre parole et créer une connexion infaillible."
     },
     hestia: {
-      title: "En tant que Gardien du Calme...",
+      title: "En tant que Gardien du Calme (Estia)...",
       text: "Votre sérénité est contagieuse. Voyons ensemble comment rayonner cette force tranquille sur toutes les scènes de votre vie."
     }
   };
