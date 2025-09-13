@@ -756,7 +756,7 @@ export default function Results() {
             <div className="webinar-cta">
               <button 
                 className="webinar-signup-btn primary-btn"
-                onClick={() => window.open('LIEN_INSCRIPTION_ICI', '_blank')}
+                onClick={() => setShowConfirmation(true)}
               >
                 <span className="btn-text">Je réserve ma place offerte</span>
                 <span className="btn-icon">✨</span>
@@ -775,10 +775,10 @@ export default function Results() {
               <div className="flex justify-center">
                 <PartyPopper className="w-12 h-12 text-accent" />
               </div>
-              <DialogTitle className="text-xl font-poppins text-primary leading-relaxed">
-                Je te remercie pour ton inscription. Tu vas recevoir dans les prochaines minutes un email de confirmation avec un mot d'accueil. Si tu ne l'as pas dans ta boite de réception, regarde dans tes spams. A Bientôt.
-                <br /><br />
-                Sandrina
+              <DialogTitle className="text-center">
+                <p className="webinar-confirmation-text text-primary font-poppins leading-relaxed">
+                  Merci pour votre inscription ! Vous allez recevoir dans les prochaines minutes un email de confirmation. Si vous ne le trouvez pas, vérifiez vos spams. À bientôt. Sandrina
+                </p>
               </DialogTitle>
             </DialogHeader>
             <div className="flex justify-center pt-4">

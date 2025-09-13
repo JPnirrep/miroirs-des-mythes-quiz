@@ -169,13 +169,17 @@ All colors MUST be HSL.
   }
 
   .webinar-signup-btn {
-    @apply inline-flex items-center gap-2 bg-gradient-divine hover:bg-gradient-golden text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg shadow-divine hover:shadow-mythical transition-all duration-300 transform hover:scale-105;
+    @apply inline-flex items-center gap-2 bg-gradient-divine text-primary-foreground px-8 py-4 rounded-lg font-semibold text-lg shadow-divine;
     font-family: 'Poppins', sans-serif;
   }
 
   .webinar-disclaimer {
     @apply text-sm text-primary/60 max-w-md mx-auto;
     font-family: 'Lato', sans-serif;
+  }
+
+  .webinar-confirmation-text {
+    font-size: 13pt;
   }
 
   .transition-message {
