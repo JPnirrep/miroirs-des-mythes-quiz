@@ -814,8 +814,8 @@ export default function Results() {
                 const parsedUserData = userData ? JSON.parse(userData) : undefined;
                 generatePDF(profileAnalysis, scores, parsedUserData);
               }}
-              variant="secondary"
-              className="font-lato bg-accent hover:bg-accent/80 text-primary-foreground shadow-lg hover:shadow-mythical transition-all duration-300"
+              variant="outline"
+              className="font-lato border-primary text-primary hover:bg-primary hover:text-primary-foreground"
             >
               <Download className="w-4 h-4 mr-2" />
               Télécharger PDF
