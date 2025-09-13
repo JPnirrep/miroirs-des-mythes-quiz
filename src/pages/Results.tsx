@@ -51,7 +51,7 @@ const reversedQuestions = [5, 8, 13, 19];
 const archetypesData: Record<string, ArchetypeData> = {
   athena: {
     key: "athena",
-    name: "L'Architecte",
+    name: "L'Architecte (Athéna)",
     subtitle: "Phare de Clarté",
     image: athenaImage,
     title: "Ton pouvoir caché : L'Architecte de la Clarté",
@@ -69,7 +69,7 @@ const archetypesData: Record<string, ArchetypeData> = {
   },
   orphee: {
     key: "orphee",
-    name: "L'Enchanteur",
+    name: "L'Enchanteur (Orphée)",
     subtitle: "Cœur Vibrant",
     image: orpheeImage,
     title: "Ton pouvoir caché : L'Enchanteur des Cœurs",
@@ -87,7 +87,7 @@ const archetypesData: Record<string, ArchetypeData> = {
   },
   cassandre: {
     key: "cassandre",
-    name: "La Vigie",
+    name: "La Vigie (Cassandre)",
     subtitle: "Antenne Subtile",
     image: cassandreImage,
     title: "Ton pouvoir caché : La Vigie des Signaux Faibles",
@@ -105,7 +105,7 @@ const archetypesData: Record<string, ArchetypeData> = {
   },
   hestia: {
     key: "hestia",
-    name: "Le Gardien du Foyer",
+    name: "Le Gardien du Foyer (Estia)",
     subtitle: "Force Tranquille",
     image: hestiaImage,
     title: "Ton pouvoir caché : Le Gardien du Calme",
