@@ -799,11 +799,6 @@ export default function Results() {
                   className="webinar-signup-btn font-poppins"
                   onClick={() => {
                     setShowConfirmationDialog(true);
-                    // Délai pour afficher le pop-up d'abord, puis ouvrir le Google Calendar
-                    setTimeout(() => {
-                      const googleCalendarUrl = 'https://www.google.com/calendar/render?action=TEMPLATE&text=Webinaire+Passer+de+la+peur+de+d%C3%A9ranger+%C3%A0+la+joie+de+t%27exprimer&dates=20251007T080000Z/20251007T100000Z&details=Webinaire+in%C3%A9dit+pour+voix+sensibles+et+ambitieuses%0A%0A%F0%9F%94%91+Comprendre+le+sens+cach%C3%A9+de+votre+sensibilit%C3%A9%0A%F0%9F%92%AB+Recevoir+3+D%C3%A9clics+PEPPS+concrets%0A%F0%9F%8E%AF+Incarner+enfin+votre+juste+place+avec+calme+et+impact%0A%0ALien+Google+Meet%3A+https%3A//meet.google.com/hnt-uosa-ocf&location=https://meet.google.com/hnt-uosa-ocf';
-                      window.open(googleCalendarUrl, '_blank');
-                    }, 500);
                   }}
                 >
                   <span className="btn-text">Je réserve ma place offerte</span>
@@ -872,7 +867,11 @@ export default function Results() {
           </DialogDescription>
           <div className="flex justify-center pt-4">
             <Button 
-              onClick={() => setShowConfirmationDialog(false)}
+              onClick={() => {
+                const googleCalendarUrl = 'https://www.google.com/calendar/render?action=TEMPLATE&text=Webinaire+Passer+de+la+peur+de+d%C3%A9ranger+%C3%A0+la+joie+de+t%27exprimer&dates=20251007T080000Z/20251007T100000Z&details=Webinaire+in%C3%A9dit+pour+voix+sensibles+et+ambitieuses%0A%0A%F0%9F%94%91+Comprendre+le+sens+cach%C3%A9+de+votre+sensibilit%C3%A9%0A%F0%9F%92%AB+Recevoir+3+D%C3%A9clics+PEPPS+concrets%0A%F0%9F%8E%AF+Incarner+enfin+votre+juste+place+avec+calme+et+impact%0A%0ALien+Google+Meet%3A+https%3A//meet.google.com/hnt-uosa-ocf&location=https://meet.google.com/hnt-uosa-ocf';
+                window.open(googleCalendarUrl, '_blank');
+                setShowConfirmationDialog(false);
+              }}
               className="font-lato bg-gradient-divine hover:bg-gradient-golden text-primary-foreground"
             >
               Parfait !
