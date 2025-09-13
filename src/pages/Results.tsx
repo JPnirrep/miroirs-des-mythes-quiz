@@ -721,28 +721,34 @@ export default function Results() {
         <section className="max-w-4xl mx-auto text-center">
           <Card className="p-8 bg-gradient-to-br from-accent/20 to-secondary/20 border-accent shadow-divine">
             <div className="space-y-6">
-              <div className="space-y-4">
-                <h3 className="text-3xl font-cinzel font-bold text-primary">
-                  Webinaire Exclusif : Transformer Votre Don en Force
-                </h3>
-                <p className="text-xl text-primary/90 font-lato">
-                  "Passer de la peur de déranger à la joie de t'exprimer"
-                </p>
-                <div className="bg-white/10 rounded-lg p-4 inline-block">
-                  <p className="text-lg font-poppins font-semibold text-primary">
-                    📅 Mardi 7 octobre 2025 • 10h-12h
-                  </p>
-                  <p className="text-primary/80 font-lato">
-                    En ligne sur Google Meet
-                  </p>
-                </div>
-              </div>
+              <h3 className="text-3xl font-cinzel font-bold text-primary mb-4">
+                🎯 Allez plus loin avec votre profil archétypal
+              </h3>
               
               <div className="space-y-4">
-                <p className="text-lg text-primary/90 font-lato max-w-2xl mx-auto">
-                  Découvrez comment transformer votre sensibilité en super-pouvoir de communication. 
-                  Un accompagnement personnalisé pour révéler votre potentiel unique.
+                <p className="text-xl text-primary/90 font-lato leading-relaxed max-w-3xl mx-auto">
+                  Vous venez de découvrir votre profil unique ! Maintenant, participez à notre webinaire exclusif pour apprendre à utiliser pleinement vos forces archétypales.
                 </p>
+                
+                <div className="bg-white/10 rounded-lg p-6 my-6">
+                  <h4 className="text-lg font-poppins font-semibold text-primary mb-3">
+                    ✨ Ce que vous allez découvrir :
+                  </h4>
+                  <ul className="text-left space-y-2 max-w-2xl mx-auto">
+                    <li className="flex items-start">
+                      <span className="text-accent mr-2">•</span>
+                      <span className="font-lato text-primary/90">Comment exploiter vos archétypes dominants au quotidien</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-accent mr-2">•</span>
+                      <span className="font-lato text-primary/90">Les clés pour développer vos archétypes secondaires</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-accent mr-2">•</span>
+                      <span className="font-lato text-primary/90">Des exercices pratiques personnalisés selon votre profil</span>
+                    </li>
+                  </ul>
+                </div>
                 
                 <Button
                   onClick={() => setShowConfirmation(true)}
