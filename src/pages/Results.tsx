@@ -721,48 +721,107 @@ export default function Results() {
         <section className="max-w-4xl mx-auto text-center">
           <Card className="p-8 bg-gradient-to-br from-accent/20 to-secondary/20 border-accent shadow-divine">
             <div className="space-y-6">
-              <h3 className="text-3xl font-cinzel font-bold text-primary mb-4">
-                🎯 Allez plus loin avec votre profil archétypal
-              </h3>
-              
               <div className="space-y-4">
-                <p className="text-xl text-primary/90 font-lato leading-relaxed max-w-3xl mx-auto">
-                  Vous venez de découvrir votre profil unique ! Maintenant, participez à notre webinaire exclusif pour apprendre à utiliser pleinement vos forces archétypales.
+                <h3 className="text-3xl font-cinzel font-bold text-primary animate-fade-in">
+                  🎯 Webinaire Exclusif : Transformer Votre Don en Force
+                </h3>
+                <p className="text-xl text-primary/90 font-lato leading-relaxed animate-fade-in" style={{animationDelay: "100ms"}}>
+                  "Passer de la peur de déranger à la joie de t'exprimer"
+                </p>
+                <div className="bg-white/10 rounded-lg p-4 inline-block animate-scale-in" style={{animationDelay: "200ms"}}>
+                  <p className="text-lg font-poppins font-semibold text-primary">
+                    📅 Mardi 7 octobre 2025 • 10h-12h
+                  </p>
+                  <p className="text-primary/80 font-lato">
+                    En ligne sur Google Meet
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-6 animate-fade-in" style={{animationDelay: "300ms"}}>
+                <p className="text-lg text-primary/90 font-lato max-w-2xl mx-auto">
+                  Découvrez comment transformer votre sensibilité en super-pouvoir de communication. 
+                  Un accompagnement personnalisé pour révéler votre potentiel unique.
                 </p>
                 
-                <div className="bg-white/10 rounded-lg p-6 my-6">
-                  <h4 className="text-lg font-poppins font-semibold text-primary mb-3">
-                    ✨ Ce que vous allez découvrir :
-                  </h4>
-                  <ul className="text-left space-y-2 max-w-2xl mx-auto">
-                    <li className="flex items-start">
-                      <span className="text-accent mr-2">•</span>
-                      <span className="font-lato text-primary/90">Comment exploiter vos archétypes dominants au quotidien</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-accent mr-2">•</span>
-                      <span className="font-lato text-primary/90">Les clés pour développer vos archétypes secondaires</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-accent mr-2">•</span>
-                      <span className="font-lato text-primary/90">Des exercices pratiques personnalisés selon votre profil</span>
-                    </li>
-                  </ul>
+                <div className="grid md:grid-cols-2 gap-6 text-left">
+                  <div className="bg-white/10 rounded-lg p-6">
+                    <h4 className="text-lg font-poppins font-semibold text-primary mb-3 flex items-center">
+                      <Sparkles className="w-5 h-5 mr-2 text-accent" />
+                      Ce que vous allez découvrir :
+                    </h4>
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <span className="text-accent mr-2">✨</span>
+                        <span className="font-lato text-primary/90">Votre style de communication naturel selon votre profil archétypal</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-accent mr-2">🎯</span>
+                        <span className="font-lato text-primary/90">Les 3 clés pour captiver votre auditoire sans effort</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-accent mr-2">💫</span>
+                        <span className="font-lato text-primary/90">Comment transformer votre sensibilité en atout majeur</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-accent mr-2">🚀</span>
+                        <span className="font-lato text-primary/90">La méthode pour préparer vos prises de parole en 10 minutes</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div className="bg-white/10 rounded-lg p-6">
+                    <h4 className="text-lg font-poppins font-semibold text-primary mb-3 flex items-center">
+                      <Crown className="w-5 h-5 mr-2 text-secondary" />
+                      Bonus exclusifs :
+                    </h4>
+                    <ul className="space-y-3">
+                      <li className="flex items-start">
+                        <span className="text-secondary mr-2">🎁</span>
+                        <span className="font-lato text-primary/90">Guide personnalisé selon votre profil</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-secondary mr-2">💎</span>
+                        <span className="font-lato text-primary/90">Session Q&A en direct avec Sandrina</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-secondary mr-2">🌟</span>
+                        <span className="font-lato text-primary/90">Accès au replay pendant 30 jours</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-secondary mr-2">🔥</span>
+                        <span className="font-lato text-primary/90">Kit d'exercices pratiques à emporter</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                
+                <div className="bg-gradient-to-r from-accent/20 to-secondary/20 rounded-xl p-6 border border-accent/30">
+                  <p className="text-center font-poppins font-semibold text-primary mb-2">
+                    🎯 Spécialement conçu pour les personnes sensibles et empathiques
+                  </p>
+                  <p className="text-center font-lato text-primary/80 text-sm">
+                    Un espace bienveillant où votre sensibilité devient votre plus grande force
+                  </p>
                 </div>
                 
                 <Button
                   onClick={() => setShowConfirmation(true)}
                   size="lg"
-                  className="font-poppins font-semibold text-lg px-8 py-6 bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-divine hover:shadow-mythical transition-all duration-300 transform hover:scale-105"
+                  className="font-poppins font-semibold text-lg px-8 py-6 bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-divine hover:shadow-mythical transition-all duration-300 transform hover:scale-105 animate-pulse"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
                   Je réserve ma place offerte
                   <Sparkles className="w-5 h-5 ml-2" />
                 </Button>
                 
-                <p className="text-sm text-primary/60 font-lato">
-                  Places limitées • Accès 100% gratuit
-                </p>
+                <div className="flex justify-center items-center gap-4 text-sm">
+                  <span className="text-primary/60 font-lato">Places limitées</span>
+                  <span className="text-accent">•</span>
+                  <span className="text-primary/60 font-lato">Accès 100% gratuit</span>
+                  <span className="text-accent">•</span>
+                  <span className="text-primary/60 font-lato">Sans engagement</span>
+                </div>
               </div>
             </div>
           </Card>
