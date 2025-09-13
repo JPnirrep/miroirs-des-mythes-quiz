@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, RotateCcw, Crown, Sparkles, Star, Target, Download } from "lucide-react";
+import { ArrowLeft, RotateCcw, Crown, Sparkles, Star, Target, Download, PartyPopper } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import athenaImage from "@/assets/athena.jpg";
@@ -390,6 +391,7 @@ export default function Results() {
   const [scores, setScores] = useState<ArchetypeScore>({ athena: 0, orphee: 0, cassandre: 0, hestia: 0 });
   const [profileAnalysis, setProfileAnalysis] = useState<ProfileAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   useEffect(() => {
     const calculateResults = () => {
@@ -714,6 +716,79 @@ export default function Results() {
             })}
           </div>
         </section>
+
+        {/* CTA Webinaire */}
+        <section className="max-w-4xl mx-auto text-center">
+          <Card className="p-8 bg-gradient-to-br from-accent/20 to-secondary/20 border-accent shadow-divine">
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <h3 className="text-3xl font-cinzel font-bold text-primary">
+                  Webinaire Exclusif : Transformer Votre Don en Force
+                </h3>
+                <p className="text-xl text-primary/90 font-lato">
+                  "Passer de la peur de déranger à la joie de t'exprimer"
+                </p>
+                <div className="bg-white/10 rounded-lg p-4 inline-block">
+                  <p className="text-lg font-poppins font-semibold text-primary">
+                    📅 Mardi 7 octobre 2025 • 10h-12h
+                  </p>
+                  <p className="text-primary/80 font-lato">
+                    En ligne sur Google Meet
+                  </p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <p className="text-lg text-primary/90 font-lato max-w-2xl mx-auto">
+                  Découvrez comment transformer votre sensibilité en super-pouvoir de communication. 
+                  Un accompagnement personnalisé pour révéler votre potentiel unique.
+                </p>
+                
+                <Button
+                  onClick={() => setShowConfirmation(true)}
+                  size="lg"
+                  className="font-poppins font-semibold text-lg px-8 py-6 bg-gradient-divine hover:bg-gradient-golden text-primary-foreground shadow-divine hover:shadow-mythical transition-all duration-300 transform hover:scale-105"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Je réserve ma place offerte
+                  <Sparkles className="w-5 h-5 ml-2" />
+                </Button>
+                
+                <p className="text-sm text-primary/60 font-lato">
+                  Places limitées • Accès 100% gratuit
+                </p>
+              </div>
+            </div>
+          </Card>
+        </section>
+
+        {/* Dialog de confirmation */}
+        <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+          <DialogContent className="max-w-md">
+            <DialogHeader className="text-center space-y-4">
+              <div className="flex justify-center">
+                <PartyPopper className="w-12 h-12 text-accent" />
+              </div>
+              <DialogTitle className="text-xl font-poppins text-primary leading-relaxed">
+                Je te remercie pour ton inscription. Tu vas recevoir dans les prochaines minutes un email de confirmation avec un mot d'accueil. Si tu ne l'as pas dans ta boite de réception, regarde dans tes spams. A Bientôt.
+                <br /><br />
+                Sandrina
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-center pt-4">
+              <Button
+                onClick={() => {
+                  const googleCalendarUrl = "https://www.google.com/calendar/render?action=TEMPLATE&text=Passer+de+la+peur+de+d%C3%A9ranger+%C3%A0+la+joie+de+t%27exprimer&dates=20251007T080000Z/20251007T100000Z&details=Webinaire+exclusif+pour+transformer+votre+sensibilit%C3%A9+en+super-pouvoir+de+communication.+D%C3%A9couvrez+comment+r%C3%A9v%C3%A9ler+votre+potentiel+unique.&location=https://meet.google.com/hnt-uosa-ocf";
+                  window.open(googleCalendarUrl, '_blank');
+                  setShowConfirmation(false);
+                }}
+                className="font-poppins font-semibold bg-gradient-divine hover:bg-gradient-golden text-primary-foreground px-8 py-3"
+              >
+                Parfait !
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Actions */}
         <section data-actions-section className="text-center space-y-6">
