@@ -7,11 +7,8 @@ export const GoogleSheetsTester = () => {
   const { submitData, isLoading, isSuccess, error } = useSubmitToGoogleSheet();
   const { toast } = useToast();
 
-  const shouldShow = useMemo(() => {
-    if (typeof window === "undefined") return false;
-    const params = new URLSearchParams(window.location.search);
-    return params.get("test") === "1";
-  }, []);
+  // Afficher le bouton en permanence pour faciliter le test
+  const shouldShow = true;
 
   const handleTest = async () => {
     const payload = {
