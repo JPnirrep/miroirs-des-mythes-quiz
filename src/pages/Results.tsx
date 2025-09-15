@@ -10,6 +10,7 @@ import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
 import hestiaImage from "@/assets/hestia.jpg";
+import { useSubmitToGoogleSheet } from "@/hooks/useSubmitToGoogleSheet";
 
 interface ArchetypeScore {
   athena: number;
@@ -393,6 +394,9 @@ export default function Results() {
   const [isLoading, setIsLoading] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  // Hook pour l'envoi vers Google Sheets
+  const { submitData, isLoading: isSubmitting, isSuccess: isSubmitSuccess, error: submitError } = useSubmitToGoogleSheet();
+
   useEffect(() => {
     const calculateResults = () => {
       // Récupérer les réponses depuis le localStorage
@@ -417,6 +421,47 @@ export default function Results() {
     // Délai pour simuler le calcul
     setTimeout(calculateResults, 1500);
   }, []);
+
+  // UseEffect pour envoyer les données vers Google Sheets une fois les résultats calculés
+  useEffect(() => {
+    if (!isLoading && profileAnalysis && scores) {
+      // Récupérer les données utilisateur et les réponses
+      const savedUserData = localStorage.getItem('quizUserData');
+      const savedAnswers = localStorage.getItem('quizAnswers');
+      const savedWebinarData = localStorage.getItem('webinarRegistration');
+      
+      if (savedUserData && savedAnswers) {
+        try {
+          const userData = JSON.parse(savedUserData);
+          const answers = JSON.parse(savedAnswers);
+          const webinarRegistration = savedWebinarData ? JSON.parse(savedWebinarData) : false;
+          
+          // Mapper les données vers le format attendu par Google Sheets
+          const payload = {
+            prenom: userData.firstName || userData.prenom || '',
+            email: userData.email || '',
+            consentementRgpd: userData.rgpdConsent || userData.consentementRgpd || false,
+            scores: {
+              architecte: scores.athena || 0,
+              enchanteur: scores.orphee || 0,
+              vigie: scores.cassandre || 0,
+              gardien: scores.hestia || 0
+            },
+            archetypeDominant: profileAnalysis.primary || '',
+            declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
+            answers: answers.length === 24 ? answers : Array.from({ length: 24 }, () => 3), // Valeur par défaut si pas 24 réponses
+            inscriptionWebinaire: Boolean(webinarRegistration)
+          };
+
+          // Envoyer les données (une seule fois)
+          submitData(payload);
+          
+        } catch (error) {
+          console.error('Erreur lors de la préparation des données pour Google Sheets:', error);
+        }
+      }
+    }
+  }, [isLoading, profileAnalysis, scores, submitData]); // Dépendances pour déclencher l'envoi une seule fois
 
   if (isLoading || !profileAnalysis) {
     return (
