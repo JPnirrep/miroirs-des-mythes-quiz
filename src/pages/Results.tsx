@@ -39,12 +39,12 @@ interface ProfileAnalysis {
   lowestScore: string;
 }
 
-// Questions mapping selon les nouvelles consignes
+// Table de correspondance corrigée et validée pour les archétypes
 const questionMapping = {
-  orphee: [1, 7, 10, 15, 20, 23], // Cœur Vibrant
-  athena: [2, 5, 12, 16, 19, 21], // Phare de Clarté
-  cassandre: [3, 8, 11, 14, 17, 22], // Antenne Subtile
-  hestia: [4, 6, 9, 13, 18, 24] // Force Tranquille
+  orphee: [1, 4, 6, 11, 17, 21], // L'Enchanteur (Orphée)
+  athena: [2, 5, 10, 15, 19, 23], // L'Architecte (Athéna)
+  cassandre: [8, 12, 14, 16, 20, 26], // La Vigie (Cassandre)
+  hestia: [3, 7, 9, 13, 18, 22]  // Le Gardien (Hestia)
 };
 
 // Questions inversées
