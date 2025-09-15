@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-// Interface pour le payload du quiz
+// Interface pour le payload du quiz - Deploy: 2025-01-15
 interface QuizPayload {
   prenom: string;
   email: string;
