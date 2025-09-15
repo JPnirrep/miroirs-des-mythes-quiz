@@ -1,27 +1,10 @@
 // /supabase/functions/submitToGoogleSheet/index.ts
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { getGoogleAuthToken } from "../_shared/gcp_auth.ts";
 
 console.log("=== DEBUT DE L'EDGE FUNCTION ===");
 
-// Fonction d'authentification Google simplifiée pour test
-async function getGoogleAuthTokenSimple(): Promise<string> {
-  console.log("=== DEBUT AUTHENTIFICATION ===");
-  
-  const serviceAccountEmail = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_EMAIL");
-  const privateKeyRaw = Deno.env.get("GOOGLE_PRIVATE_KEY");
-
-  console.log("Email:", serviceAccountEmail ? "OK" : "MANQUANT");
-  console.log("Private Key:", privateKeyRaw ? "OK" : "MANQUANT");
-
-  if (!serviceAccountEmail || !privateKeyRaw) {
-    throw new Error("Les secrets GOOGLE_SERVICE_ACCOUNT_EMAIL et GOOGLE_PRIVATE_KEY sont requis.");
-  }
-
-  // Test basique - retourner un token factice pour détecter où ça casse
-  console.log("=== TEST: RETOUR TOKEN FACTICE ===");
-  return "test_token_123";
-}
 
 // Interface pour le payload du quiz
 interface QuizPayload {
@@ -68,20 +51,49 @@ serve(async (req) => {
         throw new Error("Payload invalide : email ou nombre de réponses incorrect.");
     }
     
-    console.log("=== DEBUT AUTHENTIFICATION ===");
-    // Test avec token factice d'abord
-    const authToken = await getGoogleAuthTokenSimple();
-    console.log("Token obtenu:", authToken);
+    console.log("=== DEBUT AUTHENTIFICATION REELLE ===");
+    const authToken = await getGoogleAuthToken();
+    console.log("Token obtenu (début):", authToken ? "OK" : "KO");
 
-    // Test simple sans appeler Google Sheets - juste retourner succès
-    console.log("=== TEST: RETOUR SUCCES SANS APPEL GOOGLE ===");
-    
-    return new Response(JSON.stringify({ 
-      success: true, 
-      message: "Test réussi - pas d'appel Google Sheets encore",
-      sheetId: sheetId.substring(0, 10) + "...",
-      payloadValid: true
-    }), {
+    // Préparer la ligne de données dans l'ordre EXACT des colonnes
+    const timestamp = new Date().toISOString();
+    const row = [
+      timestamp,
+      payload.prenom,
+      payload.email,
+      payload.consentementRgpd ? 'Oui' : 'Non',
+      payload.scores.architecte,
+      payload.scores.enchanteur,
+      payload.scores.vigie,
+      payload.scores.gardien,
+      payload.archetypeDominant,
+      payload.declicDeCroissance,
+      ...payload.answers,
+      payload.inscriptionWebinaire ? 'Oui' : 'Non',
+    ];
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+    console.log("Appel Google Sheets:", url);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ values: [row] }),
+    });
+
+    if (!response.ok) {
+      const txt = await response.text();
+      console.error("Réponse Google Sheets KO:", txt);
+      throw new Error(`Erreur de l'API Google: ${txt}`);
+    }
+
+    const data = await response.json();
+    console.log("Réponse Google Sheets OK:", data);
+
+    return new Response(JSON.stringify({ success: true, result: data }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
