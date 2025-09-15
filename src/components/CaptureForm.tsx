@@ -40,6 +40,9 @@ export const CaptureForm = () => {
       return;
     }
 
+    // Sauvegarde des données utilisateur pour les résultats
+    localStorage.setItem('quizUserData', JSON.stringify(formData));
+
     // Here we would typically send data to a backend
     toast({
       title: "Inscription réussie !",

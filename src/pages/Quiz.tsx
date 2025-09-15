@@ -200,8 +200,10 @@ export default function Quiz() {
     }
 
     if (nextQuestion >= questions.length) {
-      // Quiz terminé - rediriger vers les résultats
-      console.log("Quiz terminé:", answers);
+      // Quiz terminé - sauvegarder et rediriger vers les résultats
+      const orderedAnswers = Array.from({ length: totalQuestions }, (_, i) => answers[i + 1] ?? 3);
+      localStorage.setItem('quizAnswers', JSON.stringify(orderedAnswers));
+      console.log("Quiz terminé:", orderedAnswers);
       navigate("/results");
       return;
     }
