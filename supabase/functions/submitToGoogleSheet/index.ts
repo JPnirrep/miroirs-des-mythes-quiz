@@ -142,21 +142,23 @@ async function appendToSheet(payload: QuizPayload) {
 
   const accessToken = await getGoogleAccessToken();
 
-  // Préparer la ligne de données dans l'ordre des colonnes du Sheet
-  const timestamp = new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' });
+  // Préparer la ligne de données dans l'ordre EXACT des colonnes du Sheet
+  const timestamp = new Date().toISOString(); // Utiliser le format ISO pour la cohérence
   const row = [
-    timestamp, // Horodateur
-    payload.prenom, // Prénom
-    payload.email, // Email
-    payload.consentementRgpd ? 'Oui' : 'Non', // Consentement RGPD
-    payload.scores.architecte, // Score Architecte (Athéna)
-    payload.scores.enchanteur, // Score Enchanteur (Orphée)
-    payload.scores.vigie, // Score Vigie (Cassandre)
-    payload.scores.gardien, // Score Gardien (Hestia)
-    payload.archetypeDominant, // Archétype dominant
-    payload.declicDeCroissance, // Déclic de croissance
-    payload.inscriptionWebinaire ? 'Oui' : 'Non', // Inscription webinaire
-    ...payload.answers // Les 24 réponses du quiz
+    timestamp,
+    payload.prenom,
+    payload.email,
+    payload.consentementRgpd ? 'Oui' : 'Non',
+    payload.scores.architecte,
+    payload.scores.enchanteur,
+    payload.scores.vigie,
+    payload.scores.gardien,
+    payload.archetypeDominant,
+    payload.declicDeCroissance,
+    // D'abord les 24 réponses
+    ...payload.answers,
+    // ENSUITE l'inscription au webinaire
+    payload.inscriptionWebinaire ? 'Oui' : 'Non'
   ];
 
   // Ajouter la ligne au sheet
