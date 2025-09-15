@@ -1,5 +1,6 @@
 import { ArchetypeCard } from "@/components/ArchetypeCard";
 import { CaptureForm } from "@/components/CaptureForm";
+import { GoogleSheetsTester } from "@/components/GoogleSheetsTester";
 import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
@@ -41,6 +42,9 @@ const Index = () => {
           />
         </div>
       </header>
+
+      {/* Dev/Test: visible avec ?test=1 */}
+      <GoogleSheetsTester />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 text-center mb-16">
