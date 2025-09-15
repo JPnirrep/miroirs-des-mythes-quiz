@@ -31,32 +31,46 @@ async function getGoogleAccessToken() {
     throw new Error('Credentials Google manquants');
   }
 
-  // Nettoyage robuste de la clé privée (gère \n échappés, retours chariot, guillemets, RSA/PKCS8)
-  const stripQuotes = (s: string) => (s.startsWith('"') && s.endsWith('"')) ? s.slice(1, -1) : s;
-  const pk = stripQuotes(privateKeyRaw);
-  const pem = pk
-    // convertir les séquences littérales \n en vraies nouvelles lignes
-    .replace(/\\n/g, '\n')
-    // normaliser les fins de lignes
-    .replace(/\r\n/g, '\n');
+  // Nettoyage simple mais robuste de la clé privée
+  let cleanPrivateKey = privateKeyRaw;
+  
+  // Supprimer les guillemets si présents
+  if (cleanPrivateKey.startsWith('"') && cleanPrivateKey.endsWith('"')) {
+    cleanPrivateKey = cleanPrivateKey.slice(1, -1);
+  }
+  
+  // Remplacer les \n littéraux par de vraies nouvelles lignes
+  cleanPrivateKey = cleanPrivateKey.replace(/\\n/g, '\n');
+  
+  // Vérifier la présence des marqueurs PEM
+  if (!cleanPrivateKey.includes('-----BEGIN') || !cleanPrivateKey.includes('-----END')) {
+    throw new Error('Format de clé privée invalide (pas de marqueurs PEM)');
+  }
 
-  // Extraire le bloc base64 sans entêtes/footers
-  const base64Body = pem
-    .replace('-----BEGIN PRIVATE KEY-----', '')
-    .replace('-----END PRIVATE KEY-----', '')
-    .replace('-----BEGIN RSA PRIVATE KEY-----', '')
-    .replace('-----END RSA PRIVATE KEY-----', '')
-    .replace(/\s+/g, '')
-    .trim();
-
-  // Décodage base64 → ArrayBuffer
+  // Alerte explicite si la clé est au format PKCS#1 (RSA PRIVATE KEY)
+  if (cleanPrivateKey.includes('-----BEGIN RSA PRIVATE KEY-----')) {
+    throw new Error('Clé privée au format PKCS#1 (BEGIN RSA PRIVATE KEY). Générez une clé JSON de service account (BEGIN PRIVATE KEY).');
+  }
+  
+  // Extraire seulement le contenu base64 entre les marqueurs
+  const base64Match = cleanPrivateKey.match(/-----BEGIN[^-]+-----\s*([A-Za-z0-9+/=\s]+)\s*-----END[^-]+-----/);
+  if (!base64Match || !base64Match[1]) {
+    throw new Error('Impossible d\'extraire le contenu base64 de la clé privée');
+  }
+  
+  const base64Content = base64Match[1].replace(/\s+/g, '');
+  
+  // Décoder en Uint8Array
   let binaryKey: Uint8Array;
   try {
-    const raw = atob(base64Body);
-    binaryKey = Uint8Array.from(raw, c => c.charCodeAt(0));
-  } catch (_e) {
-    console.error('Décodage base64 de la clé privée impossible. Longueur après nettoyage:', base64Body.length);
-    throw new Error('Clé privée Google invalide (base64)');
+    const binaryStr = atob(base64Content);
+    binaryKey = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) {
+      binaryKey[i] = binaryStr.charCodeAt(i);
+    }
+  } catch (e) {
+    console.error('Erreur de décodage base64:', e);
+    throw new Error('Décodage base64 de la clé privée échoué');
   }
 
   // Import de la clé privée au format PKCS#8
