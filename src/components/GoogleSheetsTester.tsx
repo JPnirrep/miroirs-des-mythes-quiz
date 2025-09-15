@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useSubmitToGoogleSheet } from "@/hooks/useSubmitToGoogleSheet";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const GoogleSheetsTester = () => {
   const { submitData, isLoading, isSuccess, error } = useSubmitToGoogleSheet();
