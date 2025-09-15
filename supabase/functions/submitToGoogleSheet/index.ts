@@ -5,7 +5,6 @@ import { getGoogleAuthToken } from "../_shared/gcp_auth.ts";
 
 console.log("=== DEBUT DE L'EDGE FUNCTION ===");
 
-
 // Interface pour le payload du quiz
 interface QuizPayload {
   prenom: string;
@@ -30,8 +29,9 @@ const corsHeaders = {
 
 // Fonction principale du serveur
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -43,17 +43,43 @@ serve(async (req) => {
     console.log("Sheet ID:", sheetId ? "OK" : "MANQUANT");
 
     if (!sheetId) {
-      throw new Error('Le secret SHEET_ID est manquant.');
+      console.error("ERREUR: SHEET_ID manquant");
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: 'Le secret SHEET_ID est manquant.' 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
     }
 
     // Validation simple du payload
     if (!payload.email || !payload.answers || payload.answers.length !== 24) {
-        throw new Error("Payload invalide : email ou nombre de réponses incorrect.");
+      console.error("ERREUR: Payload invalide");
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: "Payload invalide : email ou nombre de réponses incorrect." 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
     }
     
     console.log("=== DEBUT AUTHENTIFICATION REELLE ===");
-    const authToken = await getGoogleAuthToken();
-    console.log("Token obtenu (début):", authToken ? "OK" : "KO");
+    let authToken;
+    try {
+      authToken = await getGoogleAuthToken();
+      console.log("Token obtenu:", authToken ? "OK" : "KO");
+    } catch (authError) {
+      console.error("ERREUR AUTHENTIFICATION:", authError);
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: `Erreur d'authentification Google: ${authError.message}` 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
 
     // Préparer la ligne de données dans l'ordre EXACT des colonnes
     const timestamp = new Date().toISOString();
@@ -86,8 +112,14 @@ serve(async (req) => {
 
     if (!response.ok) {
       const txt = await response.text();
-      console.error("Réponse Google Sheets KO:", txt);
-      throw new Error(`Erreur de l'API Google: ${txt}`);
+      console.error("Réponse Google Sheets KO:", response.status, txt);
+      return new Response(JSON.stringify({ 
+        success: false, 
+        error: `Erreur de l'API Google (${response.status}): ${txt}` 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
     }
 
     const data = await response.json();
@@ -100,7 +132,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Erreur dans la fonction submitToGoogleSheet:', error);
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
+    return new Response(JSON.stringify({ 
+      success: false, 
+      error: error.message || 'Erreur inconnue' 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
