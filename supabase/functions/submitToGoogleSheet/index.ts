@@ -25,17 +25,63 @@ const corsHeaders = {
 // Fonction pour obtenir le token d'accès Google
 async function getGoogleAccessToken() {
   const serviceAccountEmail = Deno.env.get('GOOGLE_SERVICE_ACCOUNT_EMAIL');
-  const privateKey = Deno.env.get('GOOGLE_PRIVATE_KEY');
+  const privateKeyRaw = Deno.env.get('GOOGLE_PRIVATE_KEY');
 
-  if (!serviceAccountEmail || !privateKey) {
+  if (!serviceAccountEmail || !privateKeyRaw) {
     throw new Error('Credentials Google manquants');
   }
 
-  // Nettoyer la clé privée
-  const cleanPrivateKey = privateKey.replace(/\\n/g, '\n');
+  // Nettoyage robuste de la clé privée (gère \n échappés, retours chariot, guillemets, RSA/PKCS8)
+  const stripQuotes = (s: string) => (s.startsWith('"') && s.endsWith('"')) ? s.slice(1, -1) : s;
+  const pk = stripQuotes(privateKeyRaw);
+  const pem = pk
+    // convertir les séquences littérales \n en vraies nouvelles lignes
+    .replace(/\\n/g, '\n')
+    // normaliser les fins de lignes
+    .replace(/\r\n/g, '\n');
+
+  // Extraire le bloc base64 sans entêtes/footers
+  const base64Body = pem
+    .replace('-----BEGIN PRIVATE KEY-----', '')
+    .replace('-----END PRIVATE KEY-----', '')
+    .replace('-----BEGIN RSA PRIVATE KEY-----', '')
+    .replace('-----END RSA PRIVATE KEY-----', '')
+    .replace(/\s+/g, '')
+    .trim();
+
+  // Décodage base64 → ArrayBuffer
+  let binaryKey: Uint8Array;
+  try {
+    const raw = atob(base64Body);
+    binaryKey = Uint8Array.from(raw, c => c.charCodeAt(0));
+  } catch (_e) {
+    console.error('Décodage base64 de la clé privée impossible. Longueur après nettoyage:', base64Body.length);
+    throw new Error('Clé privée Google invalide (base64)');
+  }
+
+  // Import de la clé privée au format PKCS#8
+  let cryptoKey: CryptoKey;
+  try {
+    cryptoKey = await crypto.subtle.importKey(
+      'pkcs8',
+      binaryKey,
+      { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+  } catch (e) {
+    console.error('Import de la clé privée échoué:', e);
+    throw new Error('Clé privée Google invalide (import)');
+  }
+
+  // Helpers Base64URL (JWT)
+  const toBase64Url = (input: string | Uint8Array) => {
+    const str = typeof input === 'string' ? input : String.fromCharCode(...input);
+    return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  };
 
   const now = Math.floor(Date.now() / 1000);
-  const payload = {
+  const jwtPayload = {
     iss: serviceAccountEmail,
     scope: 'https://www.googleapis.com/auth/spreadsheets',
     aud: 'https://oauth2.googleapis.com/token',
@@ -43,49 +89,24 @@ async function getGoogleAccessToken() {
     iat: now,
   };
 
-  // Créer le JWT
-  const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-  const encodedPayload = btoa(JSON.stringify(payload));
+  const headerB64 = toBase64Url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const payloadB64 = toBase64Url(JSON.stringify(jwtPayload));
+  const signingInput = `${headerB64}.${payloadB64}`;
 
-  // Importer la clé privée
-  const keyData = cleanPrivateKey
-    .replace('-----BEGIN PRIVATE KEY-----', '')
-    .replace('-----END PRIVATE KEY-----', '')
-    .replace(/\s+/g, '');
-
-  const binaryKey = Uint8Array.from(atob(keyData), c => c.charCodeAt(0));
-
-  const cryptoKey = await crypto.subtle.importKey(
-    'pkcs8',
-    binaryKey,
-    {
-      name: 'RSASSA-PKCS1-v1_5',
-      hash: 'SHA-256',
-    },
-    false,
-    ['sign']
-  );
-
-  // Signer le JWT
+  // Signature RS256
   const signatureData = await crypto.subtle.sign(
     'RSASSA-PKCS1-v1_5',
     cryptoKey,
-    new TextEncoder().encode(`${header}.${encodedPayload}`)
+    new TextEncoder().encode(signingInput)
   );
+  const signatureB64 = toBase64Url(new Uint8Array(signatureData));
 
-  const signature = btoa(String.fromCharCode(...new Uint8Array(signatureData)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
-
-  const jwt = `${header}.${encodedPayload}.${signature}`;
+  const jwt = `${signingInput}.${signatureB64}`;
 
   // Échanger le JWT contre un token d'accès
   const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
   });
 
