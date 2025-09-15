@@ -147,7 +147,7 @@ async function appendToSheet(payload: QuizPayload) {
 
   // Ajouter la ligne au sheet
   const response = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille1:append?valueInputOption=RAW`,
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
     {
       method: 'POST',
       headers: {
