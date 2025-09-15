@@ -3,14 +3,32 @@
 import { SignJWT } from "https://deno.land/x/jose@v5.6.3/index.ts";
 
 export async function getGoogleAuthToken(): Promise<string> {
-  const serviceAccountEmail = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_EMAIL");
-  const privateKeyRaw = Deno.env.get("GOOGLE_PRIVATE_KEY");
+  // Les secrets peuvent être fournis de 2 façons:
+  // 1) Classique: GOOGLE_SERVICE_ACCOUNT_EMAIL + GOOGLE_PRIVATE_KEY (PEM)
+  // 2) GOOGLE_PRIVATE_KEY contient le JSON complet du compte de service -> on extrait private_key et client_email
+  let serviceAccountEmail = Deno.env.get("GOOGLE_SERVICE_ACCOUNT_EMAIL") || "";
+  let privateKeyRaw = Deno.env.get("GOOGLE_PRIVATE_KEY") || "";
+
+  // Si le secret ressemble à un JSON, essayons d'extraire les champs attendus
+  if (privateKeyRaw.trim().startsWith("{")) {
+    try {
+      const sa = JSON.parse(privateKeyRaw);
+      if (!serviceAccountEmail && sa.client_email) {
+        serviceAccountEmail = sa.client_email;
+      }
+      if (sa.private_key) {
+        privateKeyRaw = sa.private_key;
+      }
+    } catch (_) {
+      // Ignore: on tentera avec la valeur brute
+    }
+  }
 
   if (!serviceAccountEmail || !privateKeyRaw) {
     throw new Error("Les secrets GOOGLE_SERVICE_ACCOUNT_EMAIL et GOOGLE_PRIVATE_KEY sont requis.");
   }
 
-  // Nettoyer et normaliser la clé privée
+  // Nettoyer et normaliser la clé privée (PEM)
   let privateKey = privateKeyRaw.trim();
   // Retirer d'éventuels guillemets ajoutés lors de la saisie
   if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
@@ -20,7 +38,6 @@ export async function getGoogleAuthToken(): Promise<string> {
   privateKey = privateKey.replace(/\\n/g, '\n').trim();
 
   // Corriger d'éventuels en-têtes/pieds tronqués
-  // Exemple courant: "BEGIN PRIVATE KEY-----" (il manque les 5 tirets d'ouverture)
   if (privateKey.includes('BEGIN PRIVATE KEY-----') && !privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
     privateKey = privateKey.replace(/BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
   }
@@ -30,18 +47,22 @@ export async function getGoogleAuthToken(): Promise<string> {
 
   // Vérifier le format de la clé (PKCS#8)
   if (!privateKey.includes('-----BEGIN PRIVATE KEY-----') || !privateKey.includes('-----END PRIVATE KEY-----')) {
-    throw new Error('Format de clé privée invalide. Utilisez une clé au format PKCS#8 avec "-----BEGIN PRIVATE KEY-----".');
+    throw new Error('Format de clé privée invalide. Fournissez une clé PKCS#8 (-----BEGIN PRIVATE KEY-----).');
   }
 
   try {
     // Importer la clé privée pour la signature
     const keyData = privateKey
-      .replace(/-----BEGIN PRIVATE KEY-----/, '')
-      .replace(/-----END PRIVATE KEY-----/, '')
-      .replace(/\s/g, '');
+      .replace('-----BEGIN PRIVATE KEY-----', '')
+      .replace('-----END PRIVATE KEY-----', '')
+      .replace(/\r?\n|\r/g, '')
+      .trim();
 
-    const binaryKey = Uint8Array.from(atob(keyData), (c) => c.charCodeAt(0));
-    
+    // Assainir au cas où des caractères indésirables s'y seraient glissés
+    const sanitized = keyData.replace(/[^A-Za-z0-9+/=]/g, '');
+
+    const binaryKey = Uint8Array.from(atob(sanitized), (c) => c.charCodeAt(0));
+
     const cryptoKey = await crypto.subtle.importKey(
       'pkcs8',
       binaryKey.buffer,
@@ -52,7 +73,7 @@ export async function getGoogleAuthToken(): Promise<string> {
 
     // Créer le JWT pour Google Service Account
     const now = Math.floor(Date.now() / 1000);
-    
+
     const jwt = await new SignJWT({
       iss: serviceAccountEmail,
       scope: 'https://www.googleapis.com/auth/spreadsheets',
@@ -77,9 +98,8 @@ export async function getGoogleAuthToken(): Promise<string> {
 
     const tokenData = await response.json();
     return tokenData.access_token;
-    
-  } catch (error) {
-    console.error('Erreur lors de l\'authentification Google:', error);
+  } catch (error: any) {
+    console.error("Erreur lors de l'authentification Google:", error);
     throw new Error(`Échec de l'authentification: ${error.message}`);
   }
 }
