@@ -10,16 +10,27 @@ export async function getGoogleAuthToken(): Promise<string> {
     throw new Error("Les secrets GOOGLE_SERVICE_ACCOUNT_EMAIL et GOOGLE_PRIVATE_KEY sont requis.");
   }
 
-  // Nettoyer la clé privée
-  let privateKey = privateKeyRaw;
-  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+  // Nettoyer et normaliser la clé privée
+  let privateKey = privateKeyRaw.trim();
+  // Retirer d'éventuels guillemets ajoutés lors de la saisie
+  if ((privateKey.startsWith('"') && privateKey.endsWith('"')) || (privateKey.startsWith("'") && privateKey.endsWith("'"))) {
     privateKey = privateKey.slice(1, -1);
   }
-  privateKey = privateKey.replace(/\\n/g, '\n');
+  // Remplacer les sauts de ligne échappés et trimmer
+  privateKey = privateKey.replace(/\\n/g, '\n').trim();
 
-  // Vérifier le format de la clé
-  if (!privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-    throw new Error('Format de clé privée invalide. Utilisez une clé au format PKCS#8 (BEGIN PRIVATE KEY)');
+  // Corriger d'éventuels en-têtes/pieds tronqués
+  // Exemple courant: "BEGIN PRIVATE KEY-----" (il manque les 5 tirets d'ouverture)
+  if (privateKey.includes('BEGIN PRIVATE KEY-----') && !privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+    privateKey = privateKey.replace(/BEGIN PRIVATE KEY-----/g, '-----BEGIN PRIVATE KEY-----');
+  }
+  if (privateKey.includes('END PRIVATE KEY-----') && !privateKey.includes('-----END PRIVATE KEY-----')) {
+    privateKey = privateKey.replace(/END PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
+  }
+
+  // Vérifier le format de la clé (PKCS#8)
+  if (!privateKey.includes('-----BEGIN PRIVATE KEY-----') || !privateKey.includes('-----END PRIVATE KEY-----')) {
+    throw new Error('Format de clé privée invalide. Utilisez une clé au format PKCS#8 avec "-----BEGIN PRIVATE KEY-----".');
   }
 
   try {
