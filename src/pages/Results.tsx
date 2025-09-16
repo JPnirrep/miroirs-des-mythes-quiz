@@ -422,16 +422,16 @@ export default function Results() {
     setTimeout(calculateResults, 1500);
   }, []);
 
-  // Envoi manuel des données vers Google Sheets (sur action explicite)
-  const handleSubmitToGoogleSheets = () => {
+  // Fonction pour gérer l'inscription au webinaire ET la soumission des données
+  const handleWebinarConfirmation = () => {
+    // Action 1: Soumettre les données vers Google Sheets
     try {
       const savedUserData = localStorage.getItem('quizUserData');
       const savedAnswers = localStorage.getItem('quizAnswers');
-      const savedWebinarData = localStorage.getItem('webinarRegistration');
       if (!savedUserData || !savedAnswers || !profileAnalysis) return;
+      
       const userData = JSON.parse(savedUserData);
       const answers = JSON.parse(savedAnswers);
-      const webinarRegistration = savedWebinarData ? JSON.parse(savedWebinarData) : false;
 
       const payload = {
         prenom: userData.firstName || userData.prenom || '',
@@ -445,14 +445,37 @@ export default function Results() {
         },
         archetypeDominant: profileAnalysis.primary || '',
         declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
-        answers, // envoyer exactement les réponses enregistrées
-        inscriptionWebinaire: Boolean(webinarRegistration)
+        answers,
+        inscriptionWebinaire: true // L'utilisateur confirme son inscription
       };
 
       submitData(payload as any);
     } catch (error) {
       console.error('Erreur lors de la préparation des données pour Google Sheets:', error);
     }
+
+    // Action 2: Fermer le popup et ouvrir l'agenda
+    setShowConfirmation(false);
+    
+    // Ouvrir l'agenda utilisateur pour valider l'événement
+    const calendarUrl = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Quiz PEPPS//Quiz PEPPS//FR
+BEGIN:VEVENT
+UID:webinaire-pepps-${Date.now()}@quiz.pepps
+DTSTART:20241120T140000Z
+DTEND:20241120T150000Z
+SUMMARY:Webinaire PEPPS - Développer votre archétype dominant
+DESCRIPTION:Webinaire personnalisé pour développer votre profil d'archétype dominant
+END:VEVENT
+END:VCALENDAR`;
+    
+    const link = document.createElement('a');
+    link.href = calendarUrl;
+    link.download = 'webinaire-pepps.ics';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   if (isLoading || !profileAnalysis) {
@@ -820,11 +843,7 @@ export default function Results() {
             </DialogHeader>
             <div className="flex justify-center pt-4">
               <Button
-                onClick={() => {
-                  const googleCalendarUrl = "https://www.google.com/calendar/render?action=TEMPLATE&text=Passer+de+la+peur+de+d%C3%A9ranger+%C3%A0+la+joie+de+t%27exprimer&dates=20251007T080000Z/20251007T100000Z&details=Webinaire+exclusif+pour+transformer+votre+sensibilit%C3%A9+en+super-pouvoir+de+communication.+D%C3%A9couvrez+comment+r%C3%A9v%C3%A9ler+votre+potentiel+unique.&location=https://meet.google.com/hnt-uosa-ocf";
-                  window.open(googleCalendarUrl, '_blank');
-                  setShowConfirmation(false);
-                }}
+                onClick={handleWebinarConfirmation}
                 className="font-poppins font-semibold bg-gradient-divine hover:bg-gradient-golden text-primary-foreground px-8 py-3"
               >
                 Parfait !
@@ -845,14 +864,6 @@ export default function Results() {
               Accueil
             </Button>
             
-            <Button
-              onClick={handleSubmitToGoogleSheets}
-              disabled={isSubmitting}
-              className="font-lato bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              {isSubmitting ? 'Envoi en cours…' : 'Envoyer mes résultats'}
-            </Button>
-
             <Button
               onClick={() => {
                 const userData = localStorage.getItem('quizUserData');
