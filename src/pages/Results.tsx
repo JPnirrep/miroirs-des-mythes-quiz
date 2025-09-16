@@ -423,7 +423,7 @@ export default function Results() {
   }, []);
 
   // Fonction pour gérer l'inscription au webinaire ET la soumission des données
-  const handleWebinarConfirmation = () => {
+  const handleWebinarConfirmation = async () => {
     // Action 1: Soumettre les données vers Google Sheets
     try {
       const savedUserData = localStorage.getItem('quizUserData');
@@ -449,16 +449,14 @@ export default function Results() {
         inscriptionWebinaire: true // L'utilisateur confirme son inscription
       };
 
-      submitData(payload as any);
-    } catch (error) {
-      console.error('Erreur lors de la préparation des données pour Google Sheets:', error);
-    }
+      // Attendre la soumission avant d'ouvrir l'agenda
+      await submitData(payload as any);
 
-    // Action 2: Fermer le popup et ouvrir l'agenda
-    setShowConfirmation(false);
-    
-    // Ouvrir l'agenda utilisateur pour valider l'événement
-    const calendarUrl = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR
+      // Action 2: Fermer le popup et ouvrir l'agenda
+      setShowConfirmation(false);
+      
+      // Ouvrir l'agenda utilisateur pour valider l'événement
+      const calendarUrl = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//Quiz PEPPS//Quiz PEPPS//FR
 BEGIN:VEVENT
@@ -469,13 +467,16 @@ SUMMARY:Webinaire PEPPS - Développer votre archétype dominant
 DESCRIPTION:Webinaire personnalisé pour développer votre profil d'archétype dominant
 END:VEVENT
 END:VCALENDAR`;
-    
-    const link = document.createElement('a');
-    link.href = calendarUrl;
-    link.download = 'webinaire-pepps.ics';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      
+      const link = document.createElement('a');
+      link.href = calendarUrl;
+      link.download = 'webinaire-pepps.ics';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Erreur lors de la préparation ou soumission des données:', error);
+    }
   };
 
   if (isLoading || !profileAnalysis) {
