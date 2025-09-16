@@ -52,7 +52,8 @@ const Index = () => {
           Découvrez les 4 Archétypes
         </h1>
         <p className="font-lato text-xl text-soft-gray max-w-3xl mx-auto leading-relaxed animate-fade-in" style={{ animationDelay: "200ms" }}>
-          Et si votre façon unique de communiquer était une force cachée ? Découvrez votre archétype mythologique et comment il vous aide à prendre la parole avec authenticité et sérénité
+          Et si votre façon unique de communiquer était une force cachée ?<br />
+          Découvrez votre archétype mythologique et comment il vous aide à prendre la parole avec authenticité et sérénité
         </p>
       </section>
 
