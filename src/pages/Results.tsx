@@ -428,10 +428,20 @@ export default function Results() {
     try {
       const savedUserData = localStorage.getItem('quizUserData');
       const savedAnswers = localStorage.getItem('quizAnswers');
-      if (!savedUserData || !savedAnswers || !profileAnalysis) return;
+      if (!savedUserData || !savedAnswers || !profileAnalysis) {
+        alert("Erreur : Informations utilisateur ou réponses manquantes.");
+        return;
+      }
       
       const userData = JSON.parse(savedUserData);
-      const answers = JSON.parse(savedAnswers);
+      let answers: number[] = JSON.parse(savedAnswers);
+
+      // Garantir 26 réponses (padding avec la valeur neutre 3 si nécessaire)
+      if (answers.length < 26) {
+        answers = [...answers, ...Array(26 - answers.length).fill(3)];
+      } else if (answers.length > 26) {
+        answers = answers.slice(0, 26);
+      }
 
       const payload = {
         prenom: userData.firstName || userData.prenom || '',
@@ -449,8 +459,20 @@ export default function Results() {
         inscriptionWebinaire: true // L'utilisateur confirme son inscription
       };
 
-      // Attendre la soumission avant d'ouvrir l'agenda
+      console.log("Tentative de soumission des données...", {
+        email: payload.email,
+        answersLength: payload.answers.length,
+        archetypeDominant: payload.archetypeDominant,
+      });
+
       await submitData(payload as any);
+
+      // Vérifier explicitement le succès du hook; sinon lever une erreur
+      if (!isSubmitSuccess) {
+        throw new Error(submitError || "Soumission échouée (statut inconnu)");
+      }
+
+      console.log("Soumission réussie. Ouverture de l'agenda.");
 
       // Action 2: Fermer le popup et ouvrir l'agenda
       setShowConfirmation(false);
@@ -474,8 +496,9 @@ END:VCALENDAR`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } catch (error) {
-      console.error('Erreur lors de la préparation ou soumission des données:', error);
+    } catch (error: any) {
+      console.error('ÉCHEC DE LA SOUMISSION AU SHEET :', error);
+      alert("Erreur : Vos résultats n'ont pas pu être sauvegardés. " + (error?.message || ''));
     }
   };
 
