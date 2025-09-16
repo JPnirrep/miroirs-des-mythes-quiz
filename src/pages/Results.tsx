@@ -422,46 +422,38 @@ export default function Results() {
     setTimeout(calculateResults, 1500);
   }, []);
 
-  // UseEffect pour envoyer les données vers Google Sheets une fois les résultats calculés
-  useEffect(() => {
-    if (!isLoading && profileAnalysis && scores) {
-      // Récupérer les données utilisateur et les réponses
+  // Envoi manuel des données vers Google Sheets (sur action explicite)
+  const handleSubmitToGoogleSheets = () => {
+    try {
       const savedUserData = localStorage.getItem('quizUserData');
       const savedAnswers = localStorage.getItem('quizAnswers');
       const savedWebinarData = localStorage.getItem('webinarRegistration');
-      
-      if (savedUserData && savedAnswers) {
-        try {
-          const userData = JSON.parse(savedUserData);
-          const answers = JSON.parse(savedAnswers);
-          const webinarRegistration = savedWebinarData ? JSON.parse(savedWebinarData) : false;
-          
-          // Mapper les données vers le format attendu par Google Sheets
-          const payload = {
-            prenom: userData.firstName || userData.prenom || '',
-            email: userData.email || '',
-            consentementRgpd: userData.rgpdConsent || userData.consentementRgpd || false,
-            scores: {
-              architecte: scores.athena || 0,
-              enchanteur: scores.orphee || 0,
-              vigie: scores.cassandre || 0,
-              gardien: scores.hestia || 0
-            },
-            archetypeDominant: profileAnalysis.primary || '',
-            declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
-            answers: answers.length === 26 ? answers : Array.from({ length: 26 }, () => 3), // Valeur par défaut si pas 26 réponses
-            inscriptionWebinaire: Boolean(webinarRegistration)
-          };
+      if (!savedUserData || !savedAnswers || !profileAnalysis) return;
+      const userData = JSON.parse(savedUserData);
+      const answers = JSON.parse(savedAnswers);
+      const webinarRegistration = savedWebinarData ? JSON.parse(savedWebinarData) : false;
 
-          // Envoyer les données (une seule fois)
-          submitData(payload);
-          
-        } catch (error) {
-          console.error('Erreur lors de la préparation des données pour Google Sheets:', error);
-        }
-      }
+      const payload = {
+        prenom: userData.firstName || userData.prenom || '',
+        email: userData.email || '',
+        consentementRgpd: userData.rgpdConsent || userData.consentementRgpd || false,
+        scores: {
+          architecte: scores.athena || 0,
+          enchanteur: scores.orphee || 0,
+          vigie: scores.cassandre || 0,
+          gardien: scores.hestia || 0
+        },
+        archetypeDominant: profileAnalysis.primary || '',
+        declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
+        answers, // envoyer exactement les réponses enregistrées
+        inscriptionWebinaire: Boolean(webinarRegistration)
+      };
+
+      submitData(payload as any);
+    } catch (error) {
+      console.error('Erreur lors de la préparation des données pour Google Sheets:', error);
     }
-  }, [isLoading, profileAnalysis, scores, submitData]); // Dépendances pour déclencher l'envoi une seule fois
+  };
 
   if (isLoading || !profileAnalysis) {
     return (
@@ -801,7 +793,7 @@ export default function Results() {
             <div className="webinar-cta">
               <button 
                 className="webinar-signup-btn primary-btn"
-                onClick={() => setShowConfirmation(true)}
+                onClick={() => { localStorage.setItem('webinarRegistration', 'true'); setShowConfirmation(true); }}
               >
                 <span className="btn-text">Je réserve ma place offerte</span>
                 <span className="btn-icon">✨</span>
@@ -853,6 +845,14 @@ export default function Results() {
               Accueil
             </Button>
             
+            <Button
+              onClick={handleSubmitToGoogleSheets}
+              disabled={isSubmitting}
+              className="font-lato bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isSubmitting ? 'Envoi en cours…' : 'Envoyer mes résultats'}
+            </Button>
+
             <Button
               onClick={() => {
                 const userData = localStorage.getItem('quizUserData');
