@@ -72,14 +72,17 @@ export async function getGoogleAuthToken(): Promise<string> {
     );
 
     // Créer le JWT pour Google Service Account
+    // CORRECTION POUR LE CLOCK SKEW (DÉSYNCHRONISATION D'HORLOGE)
     const now = Math.floor(Date.now() / 1000);
+    const iat = now - 60; // Date d'émission mise à 1 minute DANS LE PASSÉ pour créer une marge de tolérance
+    const exp = iat + 3600; // Expiration dans 1 heure (59 minutes à partir de "now")
 
     const jwt = await new SignJWT({
       iss: serviceAccountEmail,
       scope: 'https://www.googleapis.com/auth/spreadsheets',
       aud: 'https://oauth2.googleapis.com/token',
-      exp: now + 3600,
-      iat: now,
+      exp: exp, // Utilise la nouvelle variable d'expiration
+      iat: iat, // Utilise la nouvelle variable de date d'émission
     })
       .setProtectedHeader({ alg: 'RS256' })
       .sign(cryptoKey);
