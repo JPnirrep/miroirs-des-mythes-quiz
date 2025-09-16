@@ -1,6 +1,6 @@
 // /supabase/functions/_shared/gcp_auth.ts
 
-import { SignJWT } from "https://deno.land/x/jose@v5.6.3/index.ts";
+import { SignJWT, importPKCS8, importPKCS1 } from "https://deno.land/x/jose@v5.6.3/index.ts";
 
 export async function getGoogleAuthToken(): Promise<string> {
   // Les secrets peuvent être fournis de 2 façons:
@@ -45,31 +45,19 @@ export async function getGoogleAuthToken(): Promise<string> {
     privateKey = privateKey.replace(/END PRIVATE KEY-----/g, '-----END PRIVATE KEY-----');
   }
 
-  // Vérifier le format de la clé (PKCS#8)
-  if (!privateKey.includes('-----BEGIN PRIVATE KEY-----') || !privateKey.includes('-----END PRIVATE KEY-----')) {
-    throw new Error('Format de clé privée invalide. Fournissez une clé PKCS#8 (-----BEGIN PRIVATE KEY-----).');
-  }
-
   try {
-    // Importer la clé privée pour la signature
-    const keyData = privateKey
-      .replace('-----BEGIN PRIVATE KEY-----', '')
-      .replace('-----END PRIVATE KEY-----', '')
-      .replace(/\r?\n|\r/g, '')
-      .trim();
+    // Importer la clé privée pour la signature (supporte PKCS#8 et PKCS#1)
+    let keyLike: CryptoKey | import("https://deno.land/x/jose@v5.6.3/index.ts").KeyLike;
 
-    // Assainir au cas où des caractères indésirables s'y seraient glissés
-    const sanitized = keyData.replace(/[^A-Za-z0-9+/=]/g, '');
-
-    const binaryKey = Uint8Array.from(atob(sanitized), (c) => c.charCodeAt(0));
-
-    const cryptoKey = await crypto.subtle.importKey(
-      'pkcs8',
-      binaryKey.buffer,
-      { name: 'RSASSA-PKCS1-v1_5', hash: { name: 'SHA-256' } },
-      false,
-      ['sign']
-    );
+    if (privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
+      // PKCS#8
+      keyLike = await importPKCS8(privateKey, 'RS256');
+    } else if (privateKey.includes('-----BEGIN RSA PRIVATE KEY-----')) {
+      // PKCS#1
+      keyLike = await importPKCS1(privateKey, 'RS256');
+    } else {
+      throw new Error("Format de clé privée invalide. Fournissez une clé PKCS#8 (-----BEGIN PRIVATE KEY-----) ou PKCS#1 (-----BEGIN RSA PRIVATE KEY-----).");
+    }
 
     // Créer le JWT pour Google Service Account
     // CORRECTION POUR LE CLOCK SKEW (DÉSYNCHRONISATION D'HORLOGE)
@@ -85,7 +73,7 @@ export async function getGoogleAuthToken(): Promise<string> {
       iat: iat, // Utilise la nouvelle variable de date d'émission
     })
       .setProtectedHeader({ alg: 'RS256' })
-      .sign(cryptoKey);
+      .sign(keyLike);
 
     // Échanger le JWT contre un token d'accès
     const response = await fetch('https://oauth2.googleapis.com/token', {
