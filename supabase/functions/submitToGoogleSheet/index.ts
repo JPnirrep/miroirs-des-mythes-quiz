@@ -18,7 +18,7 @@ interface QuizPayload {
   };
   archetypeDominant: string;
   declicDeCroissance: string;
-  answers: number[]; // Doit contenir 24 réponses
+  answers: number[]; // Doit contenir 26 réponses
   inscriptionWebinaire: boolean;
 }
 
@@ -54,7 +54,7 @@ serve(async (req) => {
     }
 
     // Validation simple du payload
-    if (!payload.email || !payload.answers || payload.answers.length !== 24) {
+    if (!payload.email || !payload.answers || payload.answers.length !== 26) {
       console.error("ERREUR: Payload invalide");
       return new Response(JSON.stringify({ 
         success: false, 

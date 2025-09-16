@@ -18,7 +18,7 @@ export const GoogleSheetsTester = () => {
       scores: { architecte: 1, enchanteur: 1, vigie: 1, gardien: 1 },
       archetypeDominant: "orphee",
       declicDeCroissance: "Test automatique",
-      answers: Array.from({ length: 24 }, () => 3),
+      answers: Array.from({ length: 26 }, () => 3),
       inscriptionWebinaire: false,
     };
 

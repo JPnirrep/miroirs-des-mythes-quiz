@@ -14,7 +14,7 @@ interface QuizPayload {
   };
   archetypeDominant: string;
   declicDeCroissance: string;
-  answers: number[]; // Tableau contenant les 24 réponses
+  answers: number[]; // Tableau contenant les 26 réponses
   inscriptionWebinaire: boolean;
 }
 

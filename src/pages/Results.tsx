@@ -407,7 +407,7 @@ export default function Results() {
         answers = JSON.parse(savedAnswers);
       } else {
         // Génération d'exemple si pas de réponses sauvegardées
-        answers = Array.from({ length: 24 }, () => Math.floor(Math.random() * 5) + 1);
+        answers = Array.from({ length: 26 }, () => Math.floor(Math.random() * 5) + 1);
       }
       
       const calculatedScores = calculateScores(answers);
@@ -449,7 +449,7 @@ export default function Results() {
             },
             archetypeDominant: profileAnalysis.primary || '',
             declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
-            answers: answers.length === 24 ? answers : Array.from({ length: 24 }, () => 3), // Valeur par défaut si pas 24 réponses
+            answers: answers.length === 26 ? answers : Array.from({ length: 26 }, () => 3), // Valeur par défaut si pas 26 réponses
             inscriptionWebinaire: Boolean(webinarRegistration)
           };
 
