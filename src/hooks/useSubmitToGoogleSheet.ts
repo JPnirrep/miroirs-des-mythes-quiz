@@ -45,7 +45,8 @@ export const useSubmitToGoogleSheet = (): UseSubmitToGoogleSheetReturn => {
         prenom: payload.prenom,
         email: payload.email,
         archetype: payload.archetypeDominant,
-        answersCount: payload.answers.length
+        answers: payload.answers,
+        answersLength: payload.answers.length
       });
 
       // Appel de l'Edge Function via le client Supabase
