@@ -476,48 +476,17 @@ export default function Results() {
 
       // === ÉTAPE 2: Téléchargement de l'agenda (dans son propre try/catch) ===
       try {
-        // Créer et télécharger le fichier ICS avec une méthode plus robuste
-        const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Quiz PEPPS//Quiz PEPPS//FR
-BEGIN:VEVENT
-UID:webinaire-pepps-${Date.now()}@quiz.pepps
-DTSTART:20241120T140000Z
-DTEND:20241120T150000Z
-SUMMARY:Webinaire PEPPS - Développer votre archétype ${profileAnalysis.primary}
-DESCRIPTION:Webinaire personnalisé pour développer votre profil d'archétype dominant
-LOCATION:En ligne
-BEGIN:VALARM
-TRIGGER:-PT15M
-ACTION:DISPLAY
-DESCRIPTION:Rappel webinaire PEPPS dans 15 minutes
-END:VALARM
-END:VEVENT
-END:VCALENDAR`;
-
-        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
+        // Créer l'URL Google Calendar pour ajouter l'événement directement
+        const eventTitle = encodeURIComponent(`Webinaire PEPPS - Développer votre archétype ${profileAnalysis.primary}`);
+        const eventDescription = encodeURIComponent('Webinaire personnalisé pour développer votre profil d\'archétype dominant');
+        const startDate = '20241120T140000Z';
+        const endDate = '20241120T150000Z';
+        const location = encodeURIComponent('En ligne');
         
-        // Méthode plus robuste pour le téléchargement
-        const link = document.createElement('a');
-        link.style.display = 'none';
-        link.href = url;
-        link.download = 'webinaire-pepps.ics';
-        link.setAttribute('target', '_blank');
+        const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startDate}/${endDate}&details=${eventDescription}&location=${location}`;
         
-        document.body.appendChild(link);
-        
-        // Déclencher le téléchargement immédiatement dans une action utilisateur
-        setTimeout(() => {
-          link.click();
-          // Nettoyer après un délai
-          setTimeout(() => {
-            if (document.body.contains(link)) {
-              document.body.removeChild(link);
-            }
-            URL.revokeObjectURL(url);
-          }, 100);
-        }, 0);
+        // Ouvrir Google Calendar dans un nouvel onglet
+        window.open(googleCalendarUrl, '_blank');
 
         console.log("Fichier agenda téléchargé avec succès.");
         
