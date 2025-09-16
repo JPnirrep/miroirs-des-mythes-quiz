@@ -1,6 +1,6 @@
 // /supabase/functions/_shared/gcp_auth.ts
 
-import { SignJWT, importPKCS8, importPKCS1 } from "https://deno.land/x/jose@v5.6.3/index.ts";
+import { SignJWT, importPKCS8 } from "https://deno.land/x/jose@v5.6.3/index.ts";
 
 export async function getGoogleAuthToken(): Promise<string> {
   // Les secrets peuvent être fournis de 2 façons:
@@ -52,11 +52,8 @@ export async function getGoogleAuthToken(): Promise<string> {
     if (privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
       // PKCS#8
       keyLike = await importPKCS8(privateKey, 'RS256');
-    } else if (privateKey.includes('-----BEGIN RSA PRIVATE KEY-----')) {
-      // PKCS#1
-      keyLike = await importPKCS1(privateKey, 'RS256');
     } else {
-      throw new Error("Format de clé privée invalide. Fournissez une clé PKCS#8 (-----BEGIN PRIVATE KEY-----) ou PKCS#1 (-----BEGIN RSA PRIVATE KEY-----).");
+      throw new Error("Format de clé privée invalide. Fournissez une clé PKCS#8 (-----BEGIN PRIVATE KEY-----).");
     }
 
     // Créer le JWT pour Google Service Account
