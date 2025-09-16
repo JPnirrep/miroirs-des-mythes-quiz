@@ -466,11 +466,7 @@ export default function Results() {
       });
 
       await submitData(payload as any);
-
-      // Vérifier explicitement le succès du hook; sinon lever une erreur
-      if (!isSubmitSuccess) {
-        throw new Error(submitError || "Soumission échouée (statut inconnu)");
-      }
+      // La fonction submitData lève désormais une erreur en cas d'échec; pas de vérification d'état asynchrone ici
 
       // Si nous arrivons ici, la soumission a réussi
       console.log("Soumission réussie. Ouverture de l'agenda.");

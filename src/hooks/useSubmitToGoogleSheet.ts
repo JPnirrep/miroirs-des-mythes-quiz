@@ -69,6 +69,7 @@ export const useSubmitToGoogleSheet = (): UseSubmitToGoogleSheetReturn => {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       console.error('Erreur lors de la soumission:', errorMessage);
       setError(errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
