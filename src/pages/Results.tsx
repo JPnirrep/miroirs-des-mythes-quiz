@@ -424,10 +424,8 @@ export default function Results() {
 
   // Fonction pour gérer l'inscription au webinaire ET la soumission des données
   const handleWebinarConfirmation = async () => {
-    // Étape 1: Préparer et soumettre les données vers Google Sheets
-    let isDataSubmitted = false;
-    
     try {
+      // === ÉTAPE 1: Soumission des données ===
       const savedUserData = localStorage.getItem('quizUserData');
       const savedAnswers = localStorage.getItem('quizAnswers');
       if (!savedUserData || !savedAnswers || !profileAnalysis) {
@@ -474,19 +472,13 @@ export default function Results() {
         throw new Error(submitError || "Soumission échouée (statut inconnu)");
       }
 
+      // Si nous arrivons ici, la soumission a réussi
       console.log("Soumission réussie. Ouverture de l'agenda.");
-      isDataSubmitted = true;
-
-    } catch (error: any) {
-      console.error('ÉCHEC DE LA SOUMISSION AU SHEET :', error);
-      alert("Erreur : Vos résultats n'ont pas pu être sauvegardés. " + (error?.message || ''));
-      return; // Arrêter si la soumission échoue - ne pas télécharger l'agenda
-    }
-
-    // Étape 2: Fermer le popup et télécharger l'agenda (uniquement si soumission réussie)
-    if (isDataSubmitted) {
-      setShowConfirmation(false);
       
+      // Fermer le popup "Merci" MAINTENANT
+      setShowConfirmation(false);
+
+      // === ÉTAPE 2: Téléchargement de l'agenda (dans son propre try/catch) ===
       try {
         // Créer et télécharger le fichier ICS avec une méthode plus robuste
         const icsContent = `BEGIN:VCALENDAR
@@ -534,10 +526,16 @@ END:VCALENDAR`;
         console.log("Fichier agenda téléchargé avec succès.");
         
       } catch (agendaError: any) {
-        console.error('Erreur lors du téléchargement de l\'agenda:', agendaError);
-        // Ne pas alerter l'utilisateur pour l'agenda car la soumission a réussi
+        // Si SEULEMENT l'agenda échoue (bloqueur de popup, etc.)
+        console.warn("Soumission RÉUSSIE, mais l'ouverture de l'agenda a échoué:", agendaError);
+        // Optionnel: Alerter l'utilisateur que l'inscription est OK mais que l'agenda a été bloqué
         console.log("Les données ont été sauvegardées avec succès malgré l'échec du téléchargement de l'agenda.");
       }
+
+    } catch (submissionError: any) {
+      // Ce bloc ne s'exécute que si l'ÉTAPE 1 (submitData) échoue VRAIMENT
+      console.error("ÉCHEC RÉEL DE LA SOUMISSION AU SHEET:", submissionError);
+      alert("Erreur critique : Vos résultats n'ont pas pu être sauvegardés. " + (submissionError?.message || ''));
     }
   };
 
