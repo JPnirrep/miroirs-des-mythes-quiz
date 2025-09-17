@@ -6,15 +6,15 @@ interface QuizPayload {
   prenom: string;
   email: string;
   consentementRgpd: boolean;
-  scores: {
+  scores?: {
     architecte: number;
     enchanteur: number;
     vigie: number;
     gardien: number;
   };
-  archetypeDominant: string;
-  declicDeCroissance: string;
-  answers: number[]; // Tableau contenant les 26 réponses
+  archetypeDominant?: string;
+  declicDeCroissance?: string;
+  answers?: number[]; // Tableau contenant les 26 réponses
   inscriptionWebinaire: boolean;
 }
 
@@ -45,8 +45,7 @@ export const useSubmitToGoogleSheet = (): UseSubmitToGoogleSheetReturn => {
         prenom: payload.prenom,
         email: payload.email,
         archetype: payload.archetypeDominant,
-        answers: payload.answers,
-        answersLength: payload.answers.length
+        answersLength: Array.isArray(payload.answers) ? payload.answers.length : 0
       });
 
       // Appel de l'Edge Function via le client Supabase

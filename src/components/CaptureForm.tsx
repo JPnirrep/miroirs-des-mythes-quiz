@@ -51,12 +51,7 @@ export const CaptureForm = () => {
         prenom: formData.firstName,
         email: formData.email,
         consentementRgpd: formData.rgpdConsent,
-        inscriptionWebinaire: false,
-        // Colonnes quiz laissées vides - seront complétées plus tard
-        scores: { architecte: 0, enchanteur: 0, vigie: 0, gardien: 0 },
-        archetypeDominant: "",
-        declicDeCroissance: "",
-        answers: []
+        inscriptionWebinaire: false
       });
 
       toast({
