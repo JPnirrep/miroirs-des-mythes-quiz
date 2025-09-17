@@ -69,7 +69,7 @@ serve(async (req) => {
 
     // ÉTAPE 1: Récupérer toutes les données pour trouver la ligne avec cet email
     console.log("=== RECHERCHE DE L'EMAIL DANS LE SHEET ===");
-    const getUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A:AJ`;
+    const getUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A:AK`;
     
     const getResponse = await fetch(getUrl, {
       headers: { 'Authorization': `Bearer ${authToken}` }
@@ -112,9 +112,9 @@ serve(async (req) => {
       });
     }
 
-    // ÉTAPE 2: Mettre à jour UNIQUEMENT la colonne "Inscription Webinaire" (colonne AJ = 36ème index, 37ème colonne)
+    // ÉTAPE 2: Mettre à jour UNIQUEMENT la colonne "Inscription Webinaire" (colonne AK = 37ème colonne)
     console.log("=== MISE À JOUR DE LA COLONNE WEBINAIRE ===");
-    const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!AJ${targetRowIndex}?valueInputOption=RAW`;
+    const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!AK${targetRowIndex}?valueInputOption=RAW`;
     
     const updateResponse = await fetch(updateUrl, {
       method: 'PUT',
