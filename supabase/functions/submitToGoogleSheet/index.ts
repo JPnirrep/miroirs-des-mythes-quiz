@@ -7,19 +7,19 @@ console.log("=== DEBUT DE L'EDGE FUNCTION ===");
 
 // Interface pour le payload du quiz
 interface QuizPayload {
-  prenom: string;
+  prenom?: string;
   email: string;
-  consentementRgpd: boolean;
-  scores: {
-    architecte: number;
-    enchanteur: number;
-    vigie: number;
-    gardien: number;
+  consentementRgpd?: boolean;
+  scores?: {
+    architecte?: number;
+    enchanteur?: number;
+    vigie?: number;
+    gardien?: number;
   };
-  archetypeDominant: string;
-  declicDeCroissance: string;
-  answers: number[]; // Doit contenir 26 réponses
-  inscriptionWebinaire: boolean;
+  archetypeDominant?: string;
+  declicDeCroissance?: string;
+  answers?: number[]; // Optionnel - 26 réponses si présent
+  inscriptionWebinaire?: boolean;
 }
 
 const corsHeaders = {
@@ -53,17 +53,28 @@ serve(async (req) => {
       });
     }
 
-    // Validation simple du payload
-    if (!payload.email || !payload.answers || payload.answers.length !== 26) {
-      console.error("ERREUR: Payload invalide");
-      return new Response(JSON.stringify({ 
-        success: false, 
-        error: "Payload invalide : email ou nombre de réponses incorrect." 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      });
-    }
+// Validation souple du payload
+if (!payload.email) {
+  console.error("ERREUR: Payload invalide - email manquant");
+  return new Response(JSON.stringify({
+    success: false,
+    error: "Payload invalide : email requis."
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status: 400,
+  });
+}
+// Si des réponses sont fournies, elles doivent être au nombre de 26
+if (payload.answers && payload.answers.length !== 26) {
+  console.error("ERREUR: Payload invalide - answers doit contenir 26 éléments lorsqu'il est présent");
+  return new Response(JSON.stringify({
+    success: false,
+    error: "Payload invalide : answers doit contenir 26 éléments si fourni."
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    status: 400,
+  });
+}
     
     console.log("=== DEBUT AUTHENTIFICATION REELLE ===");
     let authToken;
@@ -81,22 +92,39 @@ serve(async (req) => {
       });
     }
 
-    // Préparer la ligne de données dans l'ordre EXACT des colonnes
-    const timestamp = new Date().toISOString();
-    const row = [
-      timestamp,
-      payload.prenom,
-      payload.email,
-      payload.consentementRgpd ? 'Oui' : 'Non',
-      payload.scores.architecte,
-      payload.scores.enchanteur,
-      payload.scores.vigie,
-      payload.scores.gardien,
-      payload.archetypeDominant,
-      payload.declicDeCroissance,
-      ...payload.answers,
-      payload.inscriptionWebinaire ? 'Oui' : 'Non',
-    ];
+// Préparer la ligne de données dans l'ordre EXACT des colonnes
+const timestamp = new Date().toISOString();
+
+// Valeurs sûres (laisser vide si non fourni)
+const safePrenom = payload.prenom ?? '';
+const safeConsent = payload.consentementRgpd ? 'Oui' : 'Non';
+const safeScores = {
+  architecte: payload.scores?.architecte ?? '',
+  enchanteur: payload.scores?.enchanteur ?? '',
+  vigie: payload.scores?.vigie ?? '',
+  gardien: payload.scores?.gardien ?? '',
+};
+const safeArchetype = payload.archetypeDominant ?? '';
+const safeDeclic = payload.declicDeCroissance ?? '';
+const safeAnswers = Array.isArray(payload.answers)
+  ? payload.answers.slice(0, 26)
+  : Array(26).fill('');
+const safeWebinar = payload.inscriptionWebinaire ? 'Oui' : 'Non';
+
+const row = [
+  timestamp,
+  safePrenom,
+  payload.email,
+  safeConsent,
+  safeScores.architecte,
+  safeScores.enchanteur,
+  safeScores.vigie,
+  safeScores.gardien,
+  safeArchetype,
+  safeDeclic,
+  ...safeAnswers,
+  safeWebinar,
+];
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Feuille%201!A1:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
     console.log("Appel Google Sheets:", url);
