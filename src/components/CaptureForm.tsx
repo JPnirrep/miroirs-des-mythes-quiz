@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useSubmitToGoogleSheet } from "@/hooks/useSubmitToGoogleSheet";
 
 
 export const CaptureForm = () => {
@@ -18,8 +19,9 @@ export const CaptureForm = () => {
   });
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { submitData, isLoading } = useSubmitToGoogleSheet();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.firstName || !formData.lastName || !formData.email) {
@@ -40,21 +42,41 @@ export const CaptureForm = () => {
       return;
     }
 
-    // Sauvegarde des données utilisateur pour les résultats
-    localStorage.setItem('quizUserData', JSON.stringify(formData));
+    try {
+      // Sauvegarde des données utilisateur pour les résultats
+      localStorage.setItem('quizUserData', JSON.stringify(formData));
 
-    // Here we would typically send data to a backend
-    toast({
-      title: "Inscription réussie !",
-      description: "Redirection vers le quiz en cours...",
-    });
-    
-    console.log("Form submitted:", formData);
-    
-    // Redirection vers le quiz après un court délai
-    setTimeout(() => {
-      navigate("/quiz-intro");
-    }, 1500);
+      // Envoi des données essentielles au Google Sheet
+      await submitData({
+        prenom: formData.firstName,
+        email: formData.email,
+        consentementRgpd: formData.rgpdConsent,
+        inscriptionWebinaire: false,
+        // Colonnes quiz laissées vides - seront complétées plus tard
+        scores: { architecte: 0, enchanteur: 0, vigie: 0, gardien: 0 },
+        archetypeDominant: "",
+        declicDeCroissance: "",
+        answers: []
+      });
+
+      toast({
+        title: "Inscription réussie !",
+        description: "Redirection vers le quiz en cours...",
+      });
+      
+      // Redirection vers le quiz après un court délai
+      setTimeout(() => {
+        navigate("/quiz-intro");
+      }, 1500);
+
+    } catch (error) {
+      toast({
+        title: "Erreur d'inscription",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive"
+      });
+      console.error("Erreur soumission CaptureForm:", error);
+    }
   };
 
   return (
@@ -131,9 +153,10 @@ export const CaptureForm = () => {
 
         <Button
           type="submit"
-          className="w-full h-14 font-poppins font-bold text-lg bg-gradient-golden hover:bg-gradient-divine transition-all duration-300 transform hover:scale-105 shadow-mythical"
+          disabled={isLoading}
+          className="w-full h-14 font-poppins font-bold text-lg bg-gradient-golden hover:bg-gradient-divine transition-all duration-300 transform hover:scale-105 shadow-mythical disabled:opacity-50"
         >
-          DÉCOUVRIR MON ARCHÉTYPE
+          {isLoading ? "INSCRIPTION EN COURS..." : "DÉCOUVRIR MON ARCHÉTYPE"}
         </Button>
       </form>
 
