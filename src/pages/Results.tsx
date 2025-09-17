@@ -11,6 +11,7 @@ import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
 import hestiaImage from "@/assets/hestia.jpg";
 import { useSubmitToGoogleSheet } from "@/hooks/useSubmitToGoogleSheet";
+import { useUpdateWebinarRegistration } from "@/hooks/useUpdateWebinarRegistration";
 
 interface ArchetypeScore {
   athena: number;
@@ -396,6 +397,9 @@ export default function Results() {
 
   // Hook pour l'envoi vers Google Sheets
   const { submitData, isLoading: isSubmitting, isSuccess: isSubmitSuccess, error: submitError } = useSubmitToGoogleSheet();
+  
+  // Hook pour l'update webinaire
+  const { updateWebinarStatus } = useUpdateWebinarRegistration();
 
   useEffect(() => {
     const calculateResults = () => {
@@ -425,7 +429,7 @@ export default function Results() {
   // Fonction pour gérer l'inscription au webinaire ET la soumission des données
   const handleWebinarConfirmation = async () => {
     try {
-      // === ÉTAPE 1: Soumission des données ===
+      // === ÉTAPE 1: TOUJOURS envoyer les données quiz complètes ===
       const savedUserData = localStorage.getItem('quizUserData');
       const savedAnswers = localStorage.getItem('quizAnswers');
       if (!savedUserData || !savedAnswers || !profileAnalysis) {
@@ -443,7 +447,7 @@ export default function Results() {
         answers = answers.slice(0, 26);
       }
 
-      const payload = {
+      const quizPayload = {
         prenom: userData.firstName || userData.prenom || '',
         email: userData.email || '',
         consentementRgpd: userData.rgpdConsent || userData.consentementRgpd || false,
@@ -456,25 +460,30 @@ export default function Results() {
         archetypeDominant: profileAnalysis.primary || '',
         declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
         answers,
-        inscriptionWebinaire: true // L'utilisateur confirme son inscription
+        inscriptionWebinaire: false // TOUJOURS false - sera updateé séparément si besoin
       };
 
-      console.log("Tentative de soumission des données...", {
-        email: payload.email,
-        answersLength: payload.answers.length,
-        archetypeDominant: payload.archetypeDominant,
+      console.log("ÉTAPE 1: Envoi des données quiz complètes...", {
+        email: quizPayload.email,
+        answersLength: quizPayload.answers.length,
+        archetypeDominant: quizPayload.archetypeDominant,
       });
 
-      await submitData(payload as any);
-      // La fonction submitData lève désormais une erreur en cas d'échec; pas de vérification d'état asynchrone ici
+      await submitData(quizPayload as any);
+      console.log("✅ ÉTAPE 1 réussie : Données quiz sauvegardées");
 
-      // Si nous arrivons ici, la soumission a réussi
-      console.log("Soumission réussie. Ouverture de l'agenda.");
+      // === ÉTAPE 2: UPDATE webinaire séparément ===
+      console.log("ÉTAPE 2: Update inscription webinaire...");
+      await updateWebinarStatus({
+        email: userData.email,
+        inscriptionWebinaire: true
+      });
+      console.log("✅ ÉTAPE 2 réussie : Inscription webinaire confirmée");
       
       // Fermer le popup "Merci" MAINTENANT
       setShowConfirmation(false);
 
-      // === ÉTAPE 2: Téléchargement de l'agenda (dans son propre try/catch) ===
+      // === ÉTAPE 3: Téléchargement de l'agenda (dans son propre try/catch) ===
       try {
         // Créer l'URL Google Calendar pour ajouter l'événement directement
         const eventTitle = encodeURIComponent(`Webinaire PEPPS - Développer votre archétype ${profileAnalysis.primary}`);
@@ -488,19 +497,18 @@ export default function Results() {
         // Ouvrir Google Calendar dans un nouvel onglet
         window.open(googleCalendarUrl, '_blank');
 
-        console.log("Fichier agenda téléchargé avec succès.");
+        console.log("✅ ÉTAPE 3 réussie : Agenda téléchargé");
         
       } catch (agendaError: any) {
         // Si SEULEMENT l'agenda échoue (bloqueur de popup, etc.)
-        console.warn("Soumission RÉUSSIE, mais l'ouverture de l'agenda a échoué:", agendaError);
-        // Optionnel: Alerter l'utilisateur que l'inscription est OK mais que l'agenda a été bloqué
+        console.warn("⚠️ Inscription réussie, mais agenda bloqué:", agendaError);
         console.log("Les données ont été sauvegardées avec succès malgré l'échec du téléchargement de l'agenda.");
       }
 
-    } catch (submissionError: any) {
-      // Ce bloc ne s'exécute que si l'ÉTAPE 1 (submitData) échoue VRAIMENT
-      console.error("ÉCHEC RÉEL DE LA SOUMISSION AU SHEET:", submissionError);
-      alert("Erreur critique : Vos résultats n'ont pas pu être sauvegardés. " + (submissionError?.message || ''));
+    } catch (error: any) {
+      // Erreur dans ÉTAPE 1 ou ÉTAPE 2
+      console.error("❌ ERREUR lors de la soumission:", error);
+      alert("Erreur : Vos résultats n'ont pas pu être sauvegardés. " + (error?.message || ''));
     }
   };
 
