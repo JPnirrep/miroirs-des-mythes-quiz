@@ -10,8 +10,8 @@ import athenaImage from "@/assets/athena.jpg";
 import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
 import hestiaImage from "@/assets/hestia.jpg";
-import { useSubmitToGoogleSheet } from "@/hooks/useSubmitToGoogleSheet";
 import { useUpdateWebinarRegistration } from "@/hooks/useUpdateWebinarRegistration";
+import { useToast } from "@/hooks/use-toast";
 
 interface ArchetypeScore {
   athena: number;
@@ -394,9 +394,7 @@ export default function Results() {
   const [profileAnalysis, setProfileAnalysis] = useState<ProfileAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showConfirmation, setShowConfirmation] = useState(false);
-
-  // Hook pour l'envoi vers Google Sheets
-  const { submitData, isLoading: isSubmitting, isSuccess: isSubmitSuccess, error: submitError } = useSubmitToGoogleSheet();
+  const { toast } = useToast();
   
   // Hook pour l'update webinaire
   const { updateWebinarStatus } = useUpdateWebinarRegistration();
@@ -469,7 +467,27 @@ export default function Results() {
         archetypeDominant: quizPayload.archetypeDominant,
       });
 
-      await submitData(quizPayload as any);
+      // Appel direct à Google Apps Script
+      const response = await fetch('https://script.google.com/macros/s/AKfycbyA51rSsVKcWnjNnKvud2UqkF8hB7sr8_dV8FKsDDf1kmMLIcdexsdaHAGrm6c14WWUHA/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: "lemiroirdesmythes",
+          payload: quizPayload
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erreur réseau: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      if (result.status === "error") {
+        throw new Error(result.message || "Erreur lors de l'envoi des données");
+      }
+
       console.log("✅ ÉTAPE 1 réussie : Données quiz sauvegardées");
 
       // === ÉTAPE 2: UPDATE webinaire séparément ===
@@ -508,7 +526,11 @@ export default function Results() {
     } catch (error: any) {
       // Erreur dans ÉTAPE 1 ou ÉTAPE 2
       console.error("❌ ERREUR lors de la soumission:", error);
-      alert("Erreur : Vos résultats n'ont pas pu être sauvegardés. " + (error?.message || ''));
+      toast({
+        title: "Erreur de sauvegarde",
+        description: `Vos résultats n'ont pas pu être sauvegardés: ${error?.message || 'Erreur inconnue'}`,
+        variant: "destructive",
+      });
     }
   };
 
