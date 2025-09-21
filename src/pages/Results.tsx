@@ -842,7 +842,7 @@ export default function Results() {
           {/* Card webinaire */}
           <div className="webinar-card">
             <div className="webinar-header">
-              <h4>Passe de la peur de déranger à la joie d'incarner ton message</h4>
+              <h4>Passer de la peur de déranger à la joie de s'exprimer, et si c'était juste ton hypersensibilité mal comprise ?</h4>
             </div>
             
             <div className="webinar-content">
