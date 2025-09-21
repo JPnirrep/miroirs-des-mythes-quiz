@@ -842,7 +842,7 @@ export default function Results() {
           {/* Card webinaire */}
           <div className="webinar-card">
             <div className="webinar-header">
-              <h4>passe de la peur de déranger à la joie d'incarner ton message</h4>
+              <h4>Passe de la peur de déranger à la joie d'incarner ton message</h4>
             </div>
             
             <div className="webinar-content">
@@ -869,10 +869,19 @@ export default function Results() {
                 </div>
                 
                 <div className="takeaways-section">
-                  <p><strong>👉 Tu repartiras avec :</strong></p>
-                  <p>Des outils concrets pour avancer dès maintenant,</p>
-                  <p>Une belle énergie pour oser te lancer,</p>
-                  <p>Et déjà tes premiers pas effectués pendant le webinaire !</p>
+                  <p><strong>Tu repartiras avec :</strong></p>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">⭐</span>
+                    <span>Des outils concrets pour avancer dès maintenant,</span>
+                  </div>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">⭐</span>
+                    <span>Une belle énergie pour oser te lancer,</span>
+                  </div>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">⭐</span>
+                    <span>Et déjà tes premiers pas effectués pendant le webinaire !</span>
+                  </div>
                 </div>
                 
                 <p>Les places sont limitées pour garantir la qualité.</p>
