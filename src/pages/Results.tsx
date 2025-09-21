@@ -842,31 +842,44 @@ export default function Results() {
           {/* Card webinaire */}
           <div className="webinar-card">
             <div className="webinar-header">
-              <h4>✨ Webinaire Inédit pour Voix Sensibles & Ambitieuses</h4>
-              <div className="webinar-badge">VOTRE ACCÈS OFFERT</div>
+              <h4>passe de la peur de déranger à la joie d'incarner ton message</h4>
             </div>
             
             <div className="webinar-content">
-              <h5>"Les 3 Déclics PEPPS pour passer de la peur de déranger à la joie d'incarner votre message"</h5>
-              
-              <div className="webinar-benefits">
-                <div className="benefit-item">
-                  <span className="benefit-icon">🔑</span>
-                  <span>Comprendre le sens caché de votre sensibilité. Découvrez pourquoi votre "peur de déranger" n'est pas une faiblesse, mais la conséquence d'un super-pouvoir mal compris.</span>
+              <div className="webinar-body-text">
+                <p>Tu es hypersensible, tu rêves de prendre la parole en public, mais tu as peur de déranger, d'être "trop", ou de ne pas trouver ta place ?</p>
+                <p>Ce webinaire est fait pour toi.</p>
+                
+                <p>Mardi 7 octobre 2025 à 10h (durée 1h15 à 1h30), je t'invite à vivre une expérience unique pour faire tes premiers pas vers une parole libre, joyeuse et authentique.</p>
+                
+                <div className="program-section">
+                  <p><strong>Au programme :</strong></p>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">⭐</span>
+                    <span>Lâcher doucement la peur de déranger : comprendre ton mode de fonctionnement et te libérer pas à pas.</span>
+                  </div>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">⭐</span>
+                    <span>Découvrir la puissance de la joie pour un hypersensible : comment ta joie devient un aimant pour ton public et crée un lien unique.</span>
+                  </div>
+                  <div className="benefit-item">
+                    <span className="benefit-icon">⭐</span>
+                    <span>Identifier l'action essentielle pour incarner ton message : sortir de la procrastination et te mettre en mouvement, avec simplicité et légèreté.</span>
+                  </div>
                 </div>
-                <div className="benefit-item">
-                  <span className="benefit-icon">💫</span>
-                  <span>Recevoir 3 "Déclics PEPPS" pour en faire votre boussole. Repartez avec des outils concrets et incarnés pour canaliser votre intensité et ne plus jamais la subir.</span>
+                
+                <div className="takeaways-section">
+                  <p><strong>👉 Tu repartiras avec :</strong></p>
+                  <p>Des outils concrets pour avancer dès maintenant,</p>
+                  <p>Une belle énergie pour oser te lancer,</p>
+                  <p>Et déjà tes premiers pas effectués pendant le webinaire !</p>
                 </div>
-                <div className="benefit-item">
-                  <span className="benefit-icon">🎯</span>
-                  <span>Incarner enfin votre juste place, avec calme et impact. Apprenez la méthode pour vous sentir légitime et en sécurité, et faire de votre voix un instrument de connexion puissant.</span>
-                </div>
-              </div>
-              
-              <div className="webinar-urgency">
-                <p><strong>🗓️ Prochaine session live :</strong> Mardi 7 octobre 2025 à 10h00 (heure de Paris)</p>
-                <p>Les places sont limitées pour garantir la qualité des échanges.</p>
+                
+                <p>Les places sont limitées pour garantir la qualité.</p>
+                <p>Et si tu ne peux pas être présent(e), tu recevras le replay.</p>
+                
+                <p>Prêt(e) à transformer ta peur en joie et à révéler ton authenticité ?</p>
+                <p>Inscris-toi vite, c'est le premier pas qui change tout.</p>
               </div>
             </div>
             <div className="webinar-cta">
@@ -874,12 +887,9 @@ export default function Results() {
                 className="webinar-signup-btn primary-btn"
                 onClick={() => { localStorage.setItem('webinarRegistration', 'true'); setShowConfirmation(true); }}
               >
-                <span className="btn-text">Je réserve ma place offerte</span>
+                <span className="btn-text">Inscris-toi vite</span>
                 <span className="btn-icon">✨</span>
               </button>
-              <p className="webinar-disclaimer">
-                Inscription 100% gratuite. Les participants recevront une offre exclusive pour acquérir le livret et un accompagnement personnalisé.
-              </p>
             </div>
           </div>
         </div>
