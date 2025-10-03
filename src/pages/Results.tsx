@@ -11,6 +11,7 @@ import orpheeImage from "@/assets/orphee.jpg";
 import cassandreImage from "@/assets/cassandre.jpg";
 import hestiaImage from "@/assets/hestia.jpg";
 import { useUpdateWebinarRegistration } from "@/hooks/useUpdateWebinarRegistration";
+import { useSubmitToGoogleSheet } from "@/hooks/useSubmitToGoogleSheet";
 import { useToast } from "@/hooks/use-toast";
 
 interface ArchetypeScore {
@@ -396,7 +397,8 @@ export default function Results() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   
-  // Hook pour l'update webinaire
+  // Hooks pour Google Sheets
+  const { submitData } = useSubmitToGoogleSheet();
   const { updateWebinarStatus } = useUpdateWebinarRegistration();
 
   useEffect(() => {
@@ -427,11 +429,15 @@ export default function Results() {
   // Fonction pour gérer l'inscription au webinaire ET la soumission des données
   const handleWebinarConfirmation = async () => {
     try {
-      // === ÉTAPE 1: TOUJOURS envoyer les données quiz complètes ===
+      // === ÉTAPE 1: TOUJOURS envoyer les données quiz complètes via Edge Function ===
       const savedUserData = localStorage.getItem('quizUserData');
       const savedAnswers = localStorage.getItem('quizAnswers');
       if (!savedUserData || !savedAnswers || !profileAnalysis) {
-        alert("Erreur : Informations utilisateur ou réponses manquantes.");
+        toast({
+          title: "Erreur",
+          description: "Informations utilisateur ou réponses manquantes.",
+          variant: "destructive",
+        });
         return;
       }
       
@@ -458,56 +464,31 @@ export default function Results() {
         archetypeDominant: profileAnalysis.primary || '',
         declicDeCroissance: getGrowthMessage(profileAnalysis.lowestScore) || '',
         answers,
-        inscriptionWebinaire: false // TOUJOURS false - sera updateé séparément si besoin
+        inscriptionWebinaire: true // TRUE car c'est une inscription webinaire
       };
 
-      console.log("ÉTAPE 1: Envoi des données quiz complètes...", {
+      console.log("ÉTAPE 1: Envoi des données quiz complètes via Edge Function...", {
         email: quizPayload.email,
         answersLength: quizPayload.answers.length,
         archetypeDominant: quizPayload.archetypeDominant,
+        inscriptionWebinaire: quizPayload.inscriptionWebinaire
       });
 
-      // Appel direct à Google Apps Script
-      const response = await fetch('https://script.google.com/macros/s/AKfycbyA51rSsVKcWnjNnKvud2UqkF8hB7sr8_dV8FKsDDf1kmMLIcdexsdaHAGrm6c14WWUHA/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: "lemiroirdesmythes",
-          payload: quizPayload
-        })
-      });
+      // Utiliser l'Edge Function Supabase au lieu de Google Apps Script
+      await submitData(quizPayload);
 
-      if (!response.ok) {
-        throw new Error(`Erreur réseau: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      if (result.status === "error") {
-        throw new Error(result.message || "Erreur lors de l'envoi des données");
-      }
-
-      console.log("✅ ÉTAPE 1 réussie : Données quiz sauvegardées");
-
-      // === ÉTAPE 2: UPDATE webinaire séparément ===
-      console.log("ÉTAPE 2: Update inscription webinaire...");
-      await updateWebinarStatus({
-        email: userData.email,
-        inscriptionWebinaire: true
-      });
-      console.log("✅ ÉTAPE 2 réussie : Inscription webinaire confirmée");
+      console.log("✅ ÉTAPE 1 réussie : Données quiz et inscription webinaire sauvegardées");
       
-      // Fermer le popup "Merci" MAINTENANT
+      // Fermer le popup "Merci"
       setShowConfirmation(false);
 
-      // === ÉTAPE 3: Téléchargement de l'agenda (dans son propre try/catch) ===
+      // === ÉTAPE 2: Téléchargement de l'agenda (dans son propre try/catch) ===
       try {
         // Créer l'URL Google Calendar pour ajouter l'événement directement
-        const eventTitle = encodeURIComponent(`Webinaire PEPPS - Développer votre archétype ${profileAnalysis.primary}`);
-        const eventDescription = encodeURIComponent('Webinaire personnalisé pour développer votre profil d\'archétype dominant');
-        const startDate = '20241120T140000Z';
-        const endDate = '20241120T150000Z';
+        const eventTitle = encodeURIComponent('Passer de la peur de déranger à la joie de s\'exprimer');
+        const eventDescription = encodeURIComponent('Webinaire PEPPS - Découvrir comment transformer votre hypersensibilité en force pour prendre la parole en public');
+        const startDate = '20251007T080000Z'; // 7 octobre 2025 à 10h (Paris = UTC+2)
+        const endDate = '20251007T093000Z'; // Durée 1h30
         const location = encodeURIComponent('En ligne');
         
         const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&dates=${startDate}/${endDate}&details=${eventDescription}&location=${location}`;
@@ -515,7 +496,7 @@ export default function Results() {
         // Ouvrir Google Calendar dans un nouvel onglet
         window.open(googleCalendarUrl, '_blank');
 
-        console.log("✅ ÉTAPE 3 réussie : Agenda téléchargé");
+        console.log("✅ ÉTAPE 2 réussie : Agenda téléchargé");
         
       } catch (agendaError: any) {
         // Si SEULEMENT l'agenda échoue (bloqueur de popup, etc.)
@@ -523,8 +504,14 @@ export default function Results() {
         console.log("Les données ont été sauvegardées avec succès malgré l'échec du téléchargement de l'agenda.");
       }
 
+      // Toast de succès
+      toast({
+        title: "Inscription confirmée !",
+        description: "Vous allez recevoir un email de confirmation. À bientôt !",
+      });
+
     } catch (error: any) {
-      // Erreur dans ÉTAPE 1 ou ÉTAPE 2
+      // Erreur dans l'envoi des données
       console.error("❌ ERREUR lors de la soumission:", error);
       toast({
         title: "Erreur de sauvegarde",
